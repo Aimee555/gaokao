@@ -1,0 +1,29 @@
+# systemd 单元：让后端 Node 进程常驻、开机自启、崩溃自动重启。
+# 安装：
+#   sudo cp deploy/gaokao-backend.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now gaokao-backend
+#   sudo systemctl status gaokao-backend      # 查看状态
+#   journalctl -u gaokao-backend -f           # 实时看日志
+#
+# 注意：WorkingDirectory 必须是 backend 目录 —— dotenv 从这里读 .env，
+# 埋点文件 analytics-events.jsonl 也默认写在这里（保证单实例 + 持久磁盘）。
+
+[Unit]
+Description=Gaokao backend (Fastify + DeepSeek)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/gaokao/backend
+ExecStart=/usr/bin/node dist/server.js
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+# .env 由应用内 dotenv 加载；如更想用 systemd 注入，取消下一行注释并把密钥放该文件
+# EnvironmentFile=/var/www/gaokao/backend/.env
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target

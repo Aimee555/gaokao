@@ -1,0 +1,27 @@
+# Render 部署蓝图（后端）。在 Render 控制台 New + → Blueprint 选中本仓库即可识别。
+# 免费档无需信用卡；注意免费档闲置约 15 分钟会休眠，首次访问冷启动约 30~50s。
+# 想永远在线可换 Fly.io / Railway（见 deploy/DEPLOY-cloud.md）。
+services:
+  - type: web
+    name: gaokao-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DEEPSEEK_API_KEY
+        sync: false # 在控制台手填，不入库
+      - key: ADMIN_TOKEN
+        sync: false # 统计页口令，控制台手填强口令
+      - key: ALLOWED_ORIGINS
+        sync: false # 填你的 Pages 前端域名，如 https://gaokao.pages.dev
+      - key: TRUST_PROXY
+        value: "true" # 在平台反代之后，必须开，否则限流按代理 IP 失效
+      - key: DEEPSEEK_DAILY_LIMIT
+        value: "500"
+      - key: REQUIRE_SESSION
+        value: "true"

@@ -1,0 +1,2646 @@
+{
+  "metadata": {
+    "project": "gaokao_major_recommendation_student_profile",
+    "version": "1.0.0",
+    "language": "zh-CN",
+    "scale": {
+      "min": 1,
+      "max": 5,
+      "description": "1=很低/完全不接受，5=很高/非常接受"
+    },
+    "tag_groups": [
+      "interest_tags",
+      "ability_tags",
+      "career_value_tags",
+      "risk_tolerance_tags",
+      "learning_style_tags",
+      "education_plan_tags",
+      "work_scene_tags",
+      "exclusion_tags",
+      "constraint_tags"
+    ],
+    "custom_input_policy": {
+      "supports_other_option": true,
+      "other_option_code": "other",
+      "free_text_field": "custom_answer",
+      "recommendation_usage": "自定义输入先进入原始答案保存；后续可通过人工规则或大模型归类到已有标签，不能直接覆盖硬性排除项。"
+    },
+    "questionnaire_id": "student_profile_deep_60",
+    "name": "高考专业推荐学生画像问卷-深度版60题",
+    "description": "用于生成更细的学生画像、职业目标、排除条件、产业匹配和专业推荐输入。"
+  },
+  "output_schema": {
+    "student_id": "string",
+    "profile_type": "string",
+    "profile_summary": "string",
+    "interest_tags": "object<number 1-5>",
+    "ability_tags": "object<number 1-5>",
+    "career_value_tags": "object<number 1-5>",
+    "risk_tolerance_tags": "object<number 1-5>",
+    "learning_style_tags": "object<number 1-5>",
+    "education_plan_tags": "object<number 1-5 or boolean>",
+    "work_scene_tags": "object<number 1-5>",
+    "exclusion_tags": "object<boolean>",
+    "constraint_tags": "object<boolean>",
+    "raw_answers": "array"
+  },
+  "module_summary": [
+    {
+      "module_code": "A",
+      "module_name": "基础信息",
+      "question_count": 6
+    },
+    {
+      "module_code": "B",
+      "module_name": "职业价值观",
+      "question_count": 8
+    },
+    {
+      "module_code": "C",
+      "module_name": "兴趣对象",
+      "question_count": 8
+    },
+    {
+      "module_code": "D",
+      "module_name": "学科能力",
+      "question_count": 10
+    },
+    {
+      "module_code": "E",
+      "module_name": "学习方式",
+      "question_count": 7
+    },
+    {
+      "module_code": "F",
+      "module_name": "风险承受",
+      "question_count": 6
+    },
+    {
+      "module_code": "G",
+      "module_name": "学历规划",
+      "question_count": 5
+    },
+    {
+      "module_code": "H",
+      "module_name": "工作场景",
+      "question_count": 5
+    },
+    {
+      "module_code": "I",
+      "module_name": "排除条件",
+      "question_count": 5
+    }
+  ],
+  "questions": [
+    {
+      "id": "A01",
+      "module": "基础信息",
+      "question": "你的高考选科/科目组合是什么？",
+      "type": "multi_select",
+      "required": true,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "physics",
+          "label": "物理",
+          "tag_effects": {
+            "constraint_tags.subject_physics": 1
+          }
+        },
+        {
+          "code": "chemistry",
+          "label": "化学",
+          "tag_effects": {
+            "constraint_tags.subject_chemistry": 1
+          }
+        },
+        {
+          "code": "biology",
+          "label": "生物",
+          "tag_effects": {
+            "constraint_tags.subject_biology": 1
+          }
+        },
+        {
+          "code": "history",
+          "label": "历史",
+          "tag_effects": {
+            "constraint_tags.subject_history": 1
+          }
+        },
+        {
+          "code": "politics",
+          "label": "政治",
+          "tag_effects": {
+            "constraint_tags.subject_politics": 1
+          }
+        },
+        {
+          "code": "geography",
+          "label": "地理",
+          "tag_effects": {
+            "constraint_tags.subject_geography": 1
+          }
+        },
+        {
+          "code": "technology",
+          "label": "技术/信息技术",
+          "tag_effects": {
+            "constraint_tags.subject_technology": 1
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "A02",
+      "module": "基础信息",
+      "question": "你目前更偏向哪类学科？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "science_strong",
+          "label": "理科明显更强",
+          "tag_effects": {
+            "ability_tags.science_orientation": 5
+          }
+        },
+        {
+          "code": "liberal_strong",
+          "label": "文科明显更强",
+          "tag_effects": {
+            "ability_tags.liberal_arts_orientation": 5
+          }
+        },
+        {
+          "code": "balanced",
+          "label": "文理差不多",
+          "tag_effects": {
+            "ability_tags.balanced_orientation": 5
+          }
+        },
+        {
+          "code": "uncertain",
+          "label": "不确定",
+          "tag_effects": {
+            "constraint_tags.orientation_uncertain": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "A03",
+      "module": "基础信息",
+      "question": "你希望未来主要在哪类城市发展？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "tier1",
+          "label": "一线城市",
+          "tag_effects": {
+            "work_scene_tags.big_city": 5,
+            "risk_tolerance_tags.big_city_tolerance": 5
+          }
+        },
+        {
+          "code": "new_tier1",
+          "label": "新一线/强二线",
+          "tag_effects": {
+            "work_scene_tags.big_city": 4,
+            "risk_tolerance_tags.big_city_tolerance": 4
+          }
+        },
+        {
+          "code": "provincial_capital",
+          "label": "省会城市",
+          "tag_effects": {
+            "work_scene_tags.provincial_city": 4
+          }
+        },
+        {
+          "code": "hometown",
+          "label": "家乡本地",
+          "tag_effects": {
+            "career_value_tags.local_development": 5,
+            "risk_tolerance_tags.big_city_tolerance": 2
+          }
+        },
+        {
+          "code": "county",
+          "label": "县城/小城市",
+          "tag_effects": {
+            "career_value_tags.local_development": 5,
+            "career_value_tags.stability": 3,
+            "risk_tolerance_tags.big_city_tolerance": 1
+          }
+        },
+        {
+          "code": "any",
+          "label": "都可以",
+          "tag_effects": {
+            "constraint_tags.city_flexible": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "A04",
+      "module": "基础信息",
+      "question": "家庭是否支持你长期读书？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "phd_ok",
+          "label": "非常支持，读研读博都可以",
+          "tag_effects": {
+            "education_plan_tags.accept_master": 5,
+            "education_plan_tags.accept_phd": 5
+          }
+        },
+        {
+          "code": "master_ok",
+          "label": "支持读研，但不太希望读太久",
+          "tag_effects": {
+            "education_plan_tags.accept_master": 4,
+            "education_plan_tags.accept_phd": 2
+          }
+        },
+        {
+          "code": "work_soon",
+          "label": "希望本科毕业尽快就业",
+          "tag_effects": {
+            "education_plan_tags.prefer_undergrad_employment": 5
+          }
+        },
+        {
+          "code": "financial_pressure",
+          "label": "经济压力较大，需要尽快工作",
+          "tag_effects": {
+            "education_plan_tags.prefer_undergrad_employment": 5,
+            "constraint_tags.financial_pressure": 1
+          }
+        },
+        {
+          "code": "uncertain",
+          "label": "不确定",
+          "tag_effects": {
+            "constraint_tags.family_support_uncertain": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "A05",
+      "module": "基础信息",
+      "question": "你是否有明确不能选择的专业方向？",
+      "type": "multi_select",
+      "required": false,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "medicine",
+          "label": "不能学医",
+          "tag_effects": {
+            "exclusion_tags.no_medicine": 1
+          }
+        },
+        {
+          "code": "teaching",
+          "label": "不能学师范",
+          "tag_effects": {
+            "exclusion_tags.no_teaching": 1
+          }
+        },
+        {
+          "code": "agriculture",
+          "label": "不能学农学",
+          "tag_effects": {
+            "exclusion_tags.no_agriculture": 1
+          }
+        },
+        {
+          "code": "design",
+          "label": "不能学艺术设计",
+          "tag_effects": {
+            "exclusion_tags.no_design": 1
+          }
+        },
+        {
+          "code": "engineering",
+          "label": "不能学工科",
+          "tag_effects": {
+            "exclusion_tags.no_engineering": 1
+          }
+        },
+        {
+          "code": "finance",
+          "label": "不能学财经",
+          "tag_effects": {
+            "exclusion_tags.no_finance": 1
+          }
+        },
+        {
+          "code": "law",
+          "label": "不能学法学",
+          "tag_effects": {
+            "exclusion_tags.no_law": 1
+          }
+        },
+        {
+          "code": "computer",
+          "label": "不能学计算机",
+          "tag_effects": {
+            "exclusion_tags.no_programming": 1
+          }
+        },
+        {
+          "code": "none",
+          "label": "暂时没有"
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "A06",
+      "module": "基础信息",
+      "question": "你目前是否已经有特别感兴趣的专业或职业？可以填写，没有则留空。",
+      "type": "free_text",
+      "required": false,
+      "max_length": 300,
+      "tag_hint": "raw_interest_major_or_job"
+    },
+    {
+      "id": "B01",
+      "module": "职业价值观",
+      "question": "你未来最看重什么？请选择最重要的 3 项并排序。",
+      "type": "ranking_multi_select",
+      "required": true,
+      "min_select": 3,
+      "max_select": 3,
+      "scoring_rule": "第1优先级=5分，第2优先级=4分，第3优先级=3分，写入 career_value_tags。",
+      "options": [
+        {
+          "code": "high_income",
+          "label": "高收入",
+          "tag_effects": {
+            "career_value_tags.high_income": 1
+          }
+        },
+        {
+          "code": "stability",
+          "label": "稳定",
+          "tag_effects": {
+            "career_value_tags.stability": 1
+          }
+        },
+        {
+          "code": "work_life_balance",
+          "label": "工作轻松/生活平衡",
+          "tag_effects": {
+            "career_value_tags.work_life_balance": 1
+          }
+        },
+        {
+          "code": "social_status",
+          "label": "社会地位",
+          "tag_effects": {
+            "career_value_tags.social_status": 1
+          }
+        },
+        {
+          "code": "freedom",
+          "label": "自由度",
+          "tag_effects": {
+            "career_value_tags.freedom": 1
+          }
+        },
+        {
+          "code": "technical_barrier",
+          "label": "技术壁垒",
+          "tag_effects": {
+            "career_value_tags.technical_barrier": 1
+          }
+        },
+        {
+          "code": "undergrad_employment",
+          "label": "本科毕业好就业",
+          "tag_effects": {
+            "career_value_tags.undergrad_employment": 1
+          }
+        },
+        {
+          "code": "public_sector",
+          "label": "适合考公考编",
+          "tag_effects": {
+            "career_value_tags.public_sector": 1
+          }
+        },
+        {
+          "code": "long_term_study",
+          "label": "读研深造",
+          "tag_effects": {
+            "education_plan_tags.accept_master": 1,
+            "career_value_tags.long_term_growth": 1
+          }
+        },
+        {
+          "code": "creativity",
+          "label": "发挥创造力",
+          "tag_effects": {
+            "career_value_tags.creativity": 1
+          }
+        },
+        {
+          "code": "social_value",
+          "label": "帮助别人/社会价值",
+          "tag_effects": {
+            "career_value_tags.social_value": 1
+          }
+        },
+        {
+          "code": "local_development",
+          "label": "能回本地发展",
+          "tag_effects": {
+            "career_value_tags.local_development": 1
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "B02",
+      "module": "职业价值观",
+      "question": "高收入和稳定相比，你更偏向哪一个？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "income_strong",
+          "label": "明显高收入",
+          "tag_effects": {
+            "career_value_tags.high_income": 5,
+            "risk_tolerance_tags.income_volatility_tolerance": 4
+          }
+        },
+        {
+          "code": "income_slight",
+          "label": "稍微高收入",
+          "tag_effects": {
+            "career_value_tags.high_income": 4,
+            "career_value_tags.stability": 2
+          }
+        },
+        {
+          "code": "balance",
+          "label": "两者平衡",
+          "tag_effects": {
+            "career_value_tags.high_income": 3,
+            "career_value_tags.stability": 3
+          }
+        },
+        {
+          "code": "stable_slight",
+          "label": "稍微稳定",
+          "tag_effects": {
+            "career_value_tags.stability": 4,
+            "career_value_tags.high_income": 2
+          }
+        },
+        {
+          "code": "stable_strong",
+          "label": "明显稳定",
+          "tag_effects": {
+            "career_value_tags.stability": 5,
+            "risk_tolerance_tags.income_volatility_tolerance": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "B03",
+      "module": "职业价值观",
+      "question": "如果轻松和发展上限只能选一个，你更偏向？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "growth_strong",
+          "label": "明显选择发展上限",
+          "tag_effects": {
+            "career_value_tags.long_term_growth": 5,
+            "career_value_tags.work_life_balance": 1
+          }
+        },
+        {
+          "code": "growth_slight",
+          "label": "稍微偏向发展上限",
+          "tag_effects": {
+            "career_value_tags.long_term_growth": 4
+          }
+        },
+        {
+          "code": "balance",
+          "label": "平衡",
+          "tag_effects": {
+            "career_value_tags.long_term_growth": 3,
+            "career_value_tags.work_life_balance": 3
+          }
+        },
+        {
+          "code": "easy_slight",
+          "label": "稍微偏向轻松",
+          "tag_effects": {
+            "career_value_tags.work_life_balance": 4
+          }
+        },
+        {
+          "code": "easy_strong",
+          "label": "明显选择轻松",
+          "tag_effects": {
+            "career_value_tags.work_life_balance": 5,
+            "risk_tolerance_tags.pressure_tolerance": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "B04",
+      "module": "职业价值观",
+      "question": "你对体制内/编制/国企的兴趣如何？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "career_value_tags.public_sector"
+    },
+    {
+      "id": "B05",
+      "module": "职业价值观",
+      "question": "你对未来创业/自由职业的兴趣如何？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "career_value_tags.freedom"
+    },
+    {
+      "id": "B06",
+      "module": "职业价值观",
+      "question": "你是否愿意为了高收入承受较大压力？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "very_willing",
+          "label": "非常愿意",
+          "tag_effects": {
+            "career_value_tags.high_income": 5,
+            "risk_tolerance_tags.pressure_tolerance": 5
+          }
+        },
+        {
+          "code": "willing",
+          "label": "比较愿意",
+          "tag_effects": {
+            "career_value_tags.high_income": 4,
+            "risk_tolerance_tags.pressure_tolerance": 4
+          }
+        },
+        {
+          "code": "some",
+          "label": "可以接受一部分",
+          "tag_effects": {
+            "risk_tolerance_tags.pressure_tolerance": 3
+          }
+        },
+        {
+          "code": "not_much",
+          "label": "不太愿意",
+          "tag_effects": {
+            "risk_tolerance_tags.pressure_tolerance": 2
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全不愿意",
+          "tag_effects": {
+            "risk_tolerance_tags.pressure_tolerance": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "B07",
+      "module": "职业价值观",
+      "question": "你对“社会认可度/体面感”的重视程度？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "career_value_tags.social_status"
+    },
+    {
+      "id": "B08",
+      "module": "职业价值观",
+      "question": "你对“不容易被 AI 替代”的重视程度？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "career_value_tags.ai_resilience"
+    },
+    {
+      "id": "C01",
+      "module": "兴趣对象",
+      "question": "你更喜欢处理什么对象？最多选 3 个。",
+      "type": "multi_select",
+      "required": true,
+      "max_select": 3,
+      "options": [
+        {
+          "code": "people",
+          "label": "人：沟通、协调、帮助别人",
+          "tag_effects": {
+            "interest_tags.people": 5
+          }
+        },
+        {
+          "code": "data",
+          "label": "数据：分析、建模、找规律",
+          "tag_effects": {
+            "interest_tags.data": 5
+          }
+        },
+        {
+          "code": "machine",
+          "label": "机器/设备：拆解、制造、控制",
+          "tag_effects": {
+            "interest_tags.machine": 5
+          }
+        },
+        {
+          "code": "code_system",
+          "label": "代码/系统：写程序、搭工具",
+          "tag_effects": {
+            "interest_tags.code_system": 5
+          }
+        },
+        {
+          "code": "business",
+          "label": "商业：赚钱、交易、品牌、管理",
+          "tag_effects": {
+            "interest_tags.business": 5
+          }
+        },
+        {
+          "code": "text_expression",
+          "label": "文字表达：写作、语言、内容",
+          "tag_effects": {
+            "interest_tags.text_expression": 5
+          }
+        },
+        {
+          "code": "life_health",
+          "label": "生命健康：医学、心理、护理、生物",
+          "tag_effects": {
+            "interest_tags.life_health": 5
+          }
+        },
+        {
+          "code": "art_design",
+          "label": "艺术设计：审美、视觉、创意",
+          "tag_effects": {
+            "interest_tags.art_design": 5
+          }
+        },
+        {
+          "code": "law_rules",
+          "label": "法律规则：规则、公平、辩论",
+          "tag_effects": {
+            "interest_tags.law_rules": 5
+          }
+        },
+        {
+          "code": "nature_environment",
+          "label": "自然环境：农业、生态、食品、环保",
+          "tag_effects": {
+            "interest_tags.nature_environment": 5
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "module": "兴趣动机",
+      "question": "你做哪类事情更有成就感？最多选 2 个。",
+      "type": "multi_select",
+      "required": true,
+      "max_select": 2,
+      "options": [
+        {
+          "code": "solve_complex_problem",
+          "label": "解决复杂问题",
+          "tag_effects": {
+            "ability_tags.logic": 2,
+            "interest_tags.data": 2
+          }
+        },
+        {
+          "code": "build_tool",
+          "label": "做出工具/作品",
+          "tag_effects": {
+            "learning_style_tags.project_learning": 3,
+            "interest_tags.code_system": 2
+          }
+        },
+        {
+          "code": "persuade",
+          "label": "说服别人",
+          "tag_effects": {
+            "ability_tags.communication": 3,
+            "interest_tags.people": 2
+          }
+        },
+        {
+          "code": "help_people",
+          "label": "帮助别人",
+          "tag_effects": {
+            "interest_tags.people": 3,
+            "career_value_tags.social_value": 2
+          }
+        },
+        {
+          "code": "make_money",
+          "label": "赚钱/做成交易",
+          "tag_effects": {
+            "interest_tags.business": 3,
+            "career_value_tags.high_income": 2
+          }
+        },
+        {
+          "code": "write_express",
+          "label": "写作表达",
+          "tag_effects": {
+            "ability_tags.language_expression": 3,
+            "interest_tags.text_expression": 2
+          }
+        },
+        {
+          "code": "design_creative",
+          "label": "设计创意",
+          "tag_effects": {
+            "interest_tags.art_design": 4,
+            "career_value_tags.creativity": 2
+          }
+        },
+        {
+          "code": "organize",
+          "label": "组织活动/团队协作",
+          "tag_effects": {
+            "ability_tags.communication": 2,
+            "interest_tags.people": 2
+          }
+        },
+        {
+          "code": "research_experiment",
+          "label": "做实验/研究",
+          "tag_effects": {
+            "learning_style_tags.research_learning": 3,
+            "interest_tags.nature_environment": 1
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "module": "兴趣对象",
+      "question": "你平时更愿意主动了解哪些内容？最多选 5 个。",
+      "type": "multi_select",
+      "required": false,
+      "max_select": 5,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "tech_ai",
+          "label": "科技/AI/互联网",
+          "tag_effects": {
+            "interest_tags.code_system": 3,
+            "interest_tags.data": 2
+          }
+        },
+        {
+          "code": "business_finance",
+          "label": "商业/金融/赚钱",
+          "tag_effects": {
+            "interest_tags.business": 4
+          }
+        },
+        {
+          "code": "health_psychology",
+          "label": "医学/心理/健康",
+          "tag_effects": {
+            "interest_tags.life_health": 4
+          }
+        },
+        {
+          "code": "law_society",
+          "label": "法律/社会/公共事务",
+          "tag_effects": {
+            "interest_tags.law_rules": 4
+          }
+        },
+        {
+          "code": "education_growth",
+          "label": "教育/儿童/成长",
+          "tag_effects": {
+            "interest_tags.people": 3,
+            "career_value_tags.social_value": 2
+          }
+        },
+        {
+          "code": "machine_car_robot",
+          "label": "机械/汽车/机器人",
+          "tag_effects": {
+            "interest_tags.machine": 4
+          }
+        },
+        {
+          "code": "game_media",
+          "label": "游戏/动画/影视/传媒",
+          "tag_effects": {
+            "interest_tags.art_design": 3,
+            "interest_tags.text_expression": 2
+          }
+        },
+        {
+          "code": "history_literature",
+          "label": "历史/文学/语言",
+          "tag_effects": {
+            "interest_tags.text_expression": 4
+          }
+        },
+        {
+          "code": "bio_chem_nature",
+          "label": "生物/化学/自然科学",
+          "tag_effects": {
+            "interest_tags.life_health": 2,
+            "interest_tags.nature_environment": 3
+          }
+        },
+        {
+          "code": "international_language",
+          "label": "国际关系/外语/出国",
+          "tag_effects": {
+            "ability_tags.english": 2,
+            "interest_tags.text_expression": 2
+          }
+        },
+        {
+          "code": "design_architecture",
+          "label": "设计/建筑/美学",
+          "tag_effects": {
+            "interest_tags.art_design": 4
+          }
+        },
+        {
+          "code": "none",
+          "label": "不太主动了解"
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "C04",
+      "module": "兴趣对象",
+      "question": "如果未来每天做类似工作，你更能接受哪种？",
+      "type": "single_choice",
+      "required": true,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "coding",
+          "label": "长期写代码、调试系统",
+          "tag_effects": {
+            "interest_tags.code_system": 5,
+            "work_scene_tags.tech_company": 3
+          }
+        },
+        {
+          "code": "docs_analysis",
+          "label": "长期看资料、写文书、做分析",
+          "tag_effects": {
+            "interest_tags.text_expression": 3,
+            "ability_tags.language_expression": 2
+          }
+        },
+        {
+          "code": "communication",
+          "label": "长期和人沟通、协调、谈判",
+          "tag_effects": {
+            "interest_tags.people": 5,
+            "ability_tags.communication": 3
+          }
+        },
+        {
+          "code": "research",
+          "label": "长期做实验、查数据、写论文",
+          "tag_effects": {
+            "learning_style_tags.research_learning": 5
+          }
+        },
+        {
+          "code": "stable_place",
+          "label": "长期在医院、学校、机关等稳定场所工作",
+          "tag_effects": {
+            "career_value_tags.stability": 3,
+            "work_scene_tags.stable_institution": 4
+          }
+        },
+        {
+          "code": "creative",
+          "label": "长期做设计、内容、创意表达",
+          "tag_effects": {
+            "interest_tags.art_design": 4,
+            "interest_tags.text_expression": 3
+          }
+        },
+        {
+          "code": "engineering_site",
+          "label": "长期跟设备、工厂、工程现场打交道",
+          "tag_effects": {
+            "interest_tags.machine": 5,
+            "work_scene_tags.factory_site": 4
+          }
+        },
+        {
+          "code": "sales_ops",
+          "label": "长期做销售、运营、市场、客户关系",
+          "tag_effects": {
+            "interest_tags.business": 4,
+            "interest_tags.people": 3
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "C05",
+      "module": "兴趣对象",
+      "question": "你对数据分析、图表、规律发现的兴趣程度？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "interest_tags.data"
+    },
+    {
+      "id": "C06",
+      "module": "兴趣对象",
+      "question": "你对机器、设备、工程系统的兴趣程度？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "interest_tags.machine"
+    },
+    {
+      "id": "C07",
+      "module": "兴趣对象",
+      "question": "你对文字、表达、内容创作的兴趣程度？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "interest_tags.text_expression"
+    },
+    {
+      "id": "C08",
+      "module": "兴趣对象",
+      "question": "你对医学、心理、生命健康相关内容的兴趣程度？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "interest_tags.life_health"
+    },
+    {
+      "id": "D01",
+      "module": "学科能力",
+      "question": "数学能力自评。",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "ability_tags.math"
+    },
+    {
+      "id": "D02",
+      "module": "学科能力",
+      "question": "逻辑推理能力自评。",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "ability_tags.logic"
+    },
+    {
+      "id": "D03",
+      "module": "学科能力",
+      "question": "物理理解能力自评。",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "ability_tags.physics"
+    },
+    {
+      "id": "D04",
+      "module": "学科能力",
+      "question": "化学生物理解和记忆能力自评。",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "ability_tags.chemistry_biology"
+    },
+    {
+      "id": "D05",
+      "module": "学科能力",
+      "question": "语文阅读和写作能力自评。",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "ability_tags.language_expression"
+    },
+    {
+      "id": "D06",
+      "module": "学科能力",
+      "question": "英语能力自评。",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "ability_tags.english"
+    },
+    {
+      "id": "D07",
+      "module": "学科能力",
+      "question": "记忆背诵能力自评。",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "ability_tags.memory"
+    },
+    {
+      "id": "D08",
+      "module": "学科能力",
+      "question": "沟通表达能力自评。",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "ability_tags.communication"
+    },
+    {
+      "id": "D09",
+      "module": "学科能力",
+      "question": "动手实践能力自评。",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "ability_tags.hands_on"
+    },
+    {
+      "id": "D10",
+      "module": "学科能力",
+      "question": "你更擅长哪种任务？最多选 3 个。",
+      "type": "multi_select",
+      "required": true,
+      "max_select": 3,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "calculation",
+          "label": "计算推理",
+          "tag_effects": {
+            "ability_tags.math": 2,
+            "ability_tags.logic": 2
+          }
+        },
+        {
+          "code": "memorization",
+          "label": "背诵记忆",
+          "tag_effects": {
+            "ability_tags.memory": 3
+          }
+        },
+        {
+          "code": "writing",
+          "label": "写作表达",
+          "tag_effects": {
+            "ability_tags.language_expression": 3
+          }
+        },
+        {
+          "code": "speaking",
+          "label": "演讲沟通",
+          "tag_effects": {
+            "ability_tags.communication": 3
+          }
+        },
+        {
+          "code": "hands_on",
+          "label": "动手制作",
+          "tag_effects": {
+            "ability_tags.hands_on": 3
+          }
+        },
+        {
+          "code": "organization",
+          "label": "组织协调",
+          "tag_effects": {
+            "ability_tags.communication": 2,
+            "interest_tags.people": 2
+          }
+        },
+        {
+          "code": "aesthetic",
+          "label": "审美设计",
+          "tag_effects": {
+            "interest_tags.art_design": 3
+          }
+        },
+        {
+          "code": "data_analysis",
+          "label": "数据分析",
+          "tag_effects": {
+            "interest_tags.data": 3,
+            "ability_tags.logic": 1
+          }
+        },
+        {
+          "code": "programming",
+          "label": "编程/信息技术",
+          "tag_effects": {
+            "interest_tags.code_system": 3
+          }
+        },
+        {
+          "code": "care_observe",
+          "label": "观察照顾别人",
+          "tag_effects": {
+            "interest_tags.life_health": 2,
+            "interest_tags.people": 2
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "E01",
+      "module": "学习方式",
+      "question": "你更喜欢哪种学习方式？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "theory",
+          "label": "理论推导型：公式、原理、逻辑",
+          "tag_effects": {
+            "learning_style_tags.theory_learning": 5
+          }
+        },
+        {
+          "code": "project",
+          "label": "实践项目型：做项目、做作品",
+          "tag_effects": {
+            "learning_style_tags.project_learning": 5
+          }
+        },
+        {
+          "code": "memory",
+          "label": "记忆理解型：背诵、理解、归纳",
+          "tag_effects": {
+            "learning_style_tags.exam_learning": 4,
+            "ability_tags.memory": 1
+          }
+        },
+        {
+          "code": "discussion",
+          "label": "讨论表达型：辩论、展示、写作",
+          "tag_effects": {
+            "learning_style_tags.discussion_learning": 5
+          }
+        },
+        {
+          "code": "research",
+          "label": "实验研究型：实验、数据、论文",
+          "tag_effects": {
+            "learning_style_tags.research_learning": 5
+          }
+        },
+        {
+          "code": "mixed",
+          "label": "混合型，都可以",
+          "tag_effects": {
+            "learning_style_tags.flexible_learning": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "E02",
+      "module": "学习方式",
+      "question": "你能接受大学期间持续学习高难度内容吗？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "yes",
+          "label": "可以，我愿意长期学难东西",
+          "tag_effects": {
+            "learning_style_tags.hard_learning_tolerance": 5
+          }
+        },
+        {
+          "code": "reward_based",
+          "label": "可以，但需要看到回报",
+          "tag_effects": {
+            "learning_style_tags.hard_learning_tolerance": 4,
+            "career_value_tags.high_income": 1
+          }
+        },
+        {
+          "code": "normal",
+          "label": "一般，不想太痛苦",
+          "tag_effects": {
+            "learning_style_tags.hard_learning_tolerance": 3
+          }
+        },
+        {
+          "code": "low",
+          "label": "不太能接受",
+          "tag_effects": {
+            "learning_style_tags.hard_learning_tolerance": 2
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全不想",
+          "tag_effects": {
+            "learning_style_tags.hard_learning_tolerance": 1,
+            "exclusion_tags.no_hard_learning": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "E03",
+      "module": "学习方式",
+      "question": "你是否愿意在大学期间做大量项目/作品/实习？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "very_willing",
+          "label": "非常愿意",
+          "tag_effects": {
+            "learning_style_tags.project_learning": 5
+          }
+        },
+        {
+          "code": "willing",
+          "label": "比较愿意",
+          "tag_effects": {
+            "learning_style_tags.project_learning": 4
+          }
+        },
+        {
+          "code": "acceptable",
+          "label": "可以接受",
+          "tag_effects": {
+            "learning_style_tags.project_learning": 3
+          }
+        },
+        {
+          "code": "unwilling",
+          "label": "不太愿意",
+          "tag_effects": {
+            "learning_style_tags.project_learning": 2
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全不愿意",
+          "tag_effects": {
+            "learning_style_tags.project_learning": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "E04",
+      "module": "学习方式",
+      "question": "你是否愿意长期备考证书或资格考试？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "very_willing",
+          "label": "非常愿意",
+          "tag_effects": {
+            "learning_style_tags.certificate_learning": 5
+          }
+        },
+        {
+          "code": "willing",
+          "label": "比较愿意",
+          "tag_effects": {
+            "learning_style_tags.certificate_learning": 4
+          }
+        },
+        {
+          "code": "acceptable",
+          "label": "可以接受",
+          "tag_effects": {
+            "learning_style_tags.certificate_learning": 3
+          }
+        },
+        {
+          "code": "unwilling",
+          "label": "不太愿意",
+          "tag_effects": {
+            "learning_style_tags.certificate_learning": 2
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全不愿意",
+          "tag_effects": {
+            "learning_style_tags.certificate_learning": 1,
+            "exclusion_tags.no_long_certificate": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "E05",
+      "module": "学习方式",
+      "question": "你对编程/代码/计算机系统的接受程度？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "very_interested",
+          "label": "很感兴趣，愿意深入学习",
+          "tag_effects": {
+            "interest_tags.code_system": 5,
+            "learning_style_tags.project_learning": 3
+          }
+        },
+        {
+          "code": "acceptable",
+          "label": "可以学，不排斥",
+          "tag_effects": {
+            "interest_tags.code_system": 4
+          }
+        },
+        {
+          "code": "neutral",
+          "label": "一般，需要看就业回报",
+          "tag_effects": {
+            "interest_tags.code_system": 3,
+            "career_value_tags.high_income": 1
+          }
+        },
+        {
+          "code": "dislike",
+          "label": "不太喜欢",
+          "tag_effects": {
+            "interest_tags.code_system": 2,
+            "exclusion_tags.avoid_programming": 1
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全排斥",
+          "tag_effects": {
+            "interest_tags.code_system": 1,
+            "exclusion_tags.no_programming": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "E06",
+      "module": "学习方式",
+      "question": "你对数学建模/统计分析/数据分析的接受程度？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "learning_style_tags.data_modeling_acceptance"
+    },
+    {
+      "id": "E07",
+      "module": "学习方式",
+      "question": "你对实验、论文、科研的接受程度？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "learning_style_tags.research_learning"
+    },
+    {
+      "id": "F01",
+      "module": "风险承受",
+      "question": "你能接受行业竞争激烈吗？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "high",
+          "label": "能接受，竞争越强机会越大",
+          "tag_effects": {
+            "risk_tolerance_tags.competition_tolerance": 5
+          }
+        },
+        {
+          "code": "medium_high",
+          "label": "比较能接受",
+          "tag_effects": {
+            "risk_tolerance_tags.competition_tolerance": 4
+          }
+        },
+        {
+          "code": "normal",
+          "label": "一般",
+          "tag_effects": {
+            "risk_tolerance_tags.competition_tolerance": 3
+          }
+        },
+        {
+          "code": "low",
+          "label": "不太能接受",
+          "tag_effects": {
+            "risk_tolerance_tags.competition_tolerance": 2
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全不能接受",
+          "tag_effects": {
+            "risk_tolerance_tags.competition_tolerance": 1,
+            "constraint_tags.avoid_high_competition": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "F02",
+      "module": "风险承受",
+      "question": "你能接受加班吗？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "high",
+          "label": "能接受高强度加班，只要收入高",
+          "tag_effects": {
+            "risk_tolerance_tags.overtime_tolerance": 5,
+            "career_value_tags.high_income": 1
+          }
+        },
+        {
+          "code": "periodic",
+          "label": "能接受阶段性加班",
+          "tag_effects": {
+            "risk_tolerance_tags.overtime_tolerance": 4
+          }
+        },
+        {
+          "code": "occasionally",
+          "label": "偶尔可以",
+          "tag_effects": {
+            "risk_tolerance_tags.overtime_tolerance": 3
+          }
+        },
+        {
+          "code": "low",
+          "label": "不太能接受",
+          "tag_effects": {
+            "risk_tolerance_tags.overtime_tolerance": 2
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全不能接受",
+          "tag_effects": {
+            "risk_tolerance_tags.overtime_tolerance": 1,
+            "exclusion_tags.no_high_overtime": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "F03",
+      "module": "风险承受",
+      "question": "你能接受收入波动吗？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "yes_high_ceiling",
+          "label": "能接受，只要上限高",
+          "tag_effects": {
+            "risk_tolerance_tags.income_volatility_tolerance": 5,
+            "career_value_tags.high_income": 2
+          }
+        },
+        {
+          "code": "some",
+          "label": "可以接受一定波动",
+          "tag_effects": {
+            "risk_tolerance_tags.income_volatility_tolerance": 4
+          }
+        },
+        {
+          "code": "stable_prefer",
+          "label": "希望尽量稳定",
+          "tag_effects": {
+            "risk_tolerance_tags.income_volatility_tolerance": 2,
+            "career_value_tags.stability": 3
+          }
+        },
+        {
+          "code": "no_obvious",
+          "label": "不能接受明显波动",
+          "tag_effects": {
+            "risk_tolerance_tags.income_volatility_tolerance": 1,
+            "career_value_tags.stability": 4
+          }
+        },
+        {
+          "code": "need_stable",
+          "label": "非常需要稳定收入",
+          "tag_effects": {
+            "risk_tolerance_tags.income_volatility_tolerance": 1,
+            "career_value_tags.stability": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "F04",
+      "module": "风险承受",
+      "question": "你能接受毕业后前几年比较辛苦吗？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "yes",
+          "label": "可以，只要后期回报好",
+          "tag_effects": {
+            "risk_tolerance_tags.pressure_tolerance": 5,
+            "career_value_tags.long_term_growth": 3
+          }
+        },
+        {
+          "code": "some",
+          "label": "可以接受一部分",
+          "tag_effects": {
+            "risk_tolerance_tags.pressure_tolerance": 4
+          }
+        },
+        {
+          "code": "normal",
+          "label": "一般",
+          "tag_effects": {
+            "risk_tolerance_tags.pressure_tolerance": 3
+          }
+        },
+        {
+          "code": "low",
+          "label": "不太能接受",
+          "tag_effects": {
+            "risk_tolerance_tags.pressure_tolerance": 2
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全不能接受",
+          "tag_effects": {
+            "risk_tolerance_tags.pressure_tolerance": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "F05",
+      "module": "风险承受",
+      "question": "你能接受岗位集中在大城市吗？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "tier1",
+          "label": "可以，愿意去一线/新一线",
+          "tag_effects": {
+            "risk_tolerance_tags.big_city_tolerance": 5
+          }
+        },
+        {
+          "code": "province",
+          "label": "可以去省会/强二线",
+          "tag_effects": {
+            "risk_tolerance_tags.big_city_tolerance": 4
+          }
+        },
+        {
+          "code": "local_prefer",
+          "label": "最好能回本地",
+          "tag_effects": {
+            "risk_tolerance_tags.big_city_tolerance": 2,
+            "career_value_tags.local_development": 4
+          }
+        },
+        {
+          "code": "local_must",
+          "label": "必须回本地",
+          "tag_effects": {
+            "risk_tolerance_tags.big_city_tolerance": 1,
+            "career_value_tags.local_development": 5
+          }
+        },
+        {
+          "code": "uncertain",
+          "label": "还不确定",
+          "tag_effects": {
+            "constraint_tags.city_uncertain": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "F06",
+      "module": "风险承受",
+      "question": "你能接受职业路径不确定，但发展空间大吗？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "risk_tolerance_tags.uncertainty_tolerance"
+    },
+    {
+      "id": "G01",
+      "module": "学历规划",
+      "question": "你对读研的态度？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "strong_yes",
+          "label": "明确愿意",
+          "tag_effects": {
+            "education_plan_tags.accept_master": 5,
+            "education_plan_tags.prefer_undergrad_employment": 1
+          }
+        },
+        {
+          "code": "if_needed",
+          "label": "如果专业需要，可以读研",
+          "tag_effects": {
+            "education_plan_tags.accept_master": 4
+          }
+        },
+        {
+          "code": "reluctant",
+          "label": "不太想，但能接受",
+          "tag_effects": {
+            "education_plan_tags.accept_master": 3
+          }
+        },
+        {
+          "code": "prefer_work",
+          "label": "希望本科毕业就就业",
+          "tag_effects": {
+            "education_plan_tags.prefer_undergrad_employment": 5,
+            "education_plan_tags.accept_master": 2
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全不想读研",
+          "tag_effects": {
+            "education_plan_tags.accept_master": 1,
+            "education_plan_tags.prefer_undergrad_employment": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02",
+      "module": "学历规划",
+      "question": "你对读博/科研的态度？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "interested",
+          "label": "感兴趣，可以考虑",
+          "tag_effects": {
+            "education_plan_tags.accept_phd": 5,
+            "learning_style_tags.research_learning": 3
+          }
+        },
+        {
+          "code": "acceptable",
+          "label": "不排斥",
+          "tag_effects": {
+            "education_plan_tags.accept_phd": 4
+          }
+        },
+        {
+          "code": "normal",
+          "label": "一般",
+          "tag_effects": {
+            "education_plan_tags.accept_phd": 3
+          }
+        },
+        {
+          "code": "not_much",
+          "label": "不太想",
+          "tag_effects": {
+            "education_plan_tags.accept_phd": 2
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全不考虑",
+          "tag_effects": {
+            "education_plan_tags.accept_phd": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "G03",
+      "module": "学历规划",
+      "question": "你是否希望本科毕业就有较清晰就业岗位？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "very",
+          "label": "非常希望",
+          "tag_effects": {
+            "education_plan_tags.prefer_undergrad_employment": 5
+          }
+        },
+        {
+          "code": "quite",
+          "label": "比较希望",
+          "tag_effects": {
+            "education_plan_tags.prefer_undergrad_employment": 4
+          }
+        },
+        {
+          "code": "neutral",
+          "label": "无所谓",
+          "tag_effects": {
+            "education_plan_tags.prefer_undergrad_employment": 3
+          }
+        },
+        {
+          "code": "study_ok",
+          "label": "可以接受继续深造",
+          "tag_effects": {
+            "education_plan_tags.prefer_undergrad_employment": 2,
+            "education_plan_tags.accept_master": 4
+          }
+        },
+        {
+          "code": "not_focus",
+          "label": "不关注",
+          "tag_effects": {
+            "education_plan_tags.prefer_undergrad_employment": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04",
+      "module": "学历规划",
+      "question": "你能接受培养周期很长的专业吗？比如医学、科研、法学长期考试。",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "yes",
+          "label": "能接受",
+          "tag_effects": {
+            "education_plan_tags.accept_long_training": 5
+          }
+        },
+        {
+          "code": "ok",
+          "label": "可以接受",
+          "tag_effects": {
+            "education_plan_tags.accept_long_training": 4
+          }
+        },
+        {
+          "code": "uncertain",
+          "label": "不确定",
+          "tag_effects": {
+            "education_plan_tags.accept_long_training": 3
+          }
+        },
+        {
+          "code": "low",
+          "label": "不太能接受",
+          "tag_effects": {
+            "education_plan_tags.accept_long_training": 2
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全不能接受",
+          "tag_effects": {
+            "education_plan_tags.accept_long_training": 1,
+            "exclusion_tags.no_long_training": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "G05",
+      "module": "学历规划",
+      "question": "你是否愿意考公、考编、考事业单位？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "yes",
+          "label": "明确愿意",
+          "tag_effects": {
+            "career_value_tags.public_sector": 5,
+            "learning_style_tags.exam_learning": 4
+          }
+        },
+        {
+          "code": "backup",
+          "label": "可以作为备选",
+          "tag_effects": {
+            "career_value_tags.public_sector": 4
+          }
+        },
+        {
+          "code": "uncertain",
+          "label": "不确定",
+          "tag_effects": {
+            "career_value_tags.public_sector": 3
+          }
+        },
+        {
+          "code": "not_much",
+          "label": "不太愿意",
+          "tag_effects": {
+            "career_value_tags.public_sector": 2
+          }
+        },
+        {
+          "code": "reject",
+          "label": "完全不愿意",
+          "tag_effects": {
+            "career_value_tags.public_sector": 1,
+            "exclusion_tags.no_public_exam": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "H01",
+      "module": "工作场景",
+      "question": "你更喜欢未来在哪种场景工作？最多选 3 个。",
+      "type": "multi_select",
+      "required": true,
+      "max_select": 3,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "office",
+          "label": "办公室",
+          "tag_effects": {
+            "work_scene_tags.office": 5
+          }
+        },
+        {
+          "code": "lab",
+          "label": "实验室",
+          "tag_effects": {
+            "work_scene_tags.lab": 5
+          }
+        },
+        {
+          "code": "hospital",
+          "label": "医院/诊所",
+          "tag_effects": {
+            "work_scene_tags.hospital": 5
+          }
+        },
+        {
+          "code": "school",
+          "label": "学校/教育机构",
+          "tag_effects": {
+            "work_scene_tags.school": 5
+          }
+        },
+        {
+          "code": "government",
+          "label": "政府/事业单位",
+          "tag_effects": {
+            "work_scene_tags.government": 5
+          }
+        },
+        {
+          "code": "tech_company",
+          "label": "互联网/科技公司",
+          "tag_effects": {
+            "work_scene_tags.tech_company": 5
+          }
+        },
+        {
+          "code": "financial",
+          "label": "金融机构",
+          "tag_effects": {
+            "work_scene_tags.financial_institution": 5
+          }
+        },
+        {
+          "code": "factory_site",
+          "label": "工厂/工程现场",
+          "tag_effects": {
+            "work_scene_tags.factory_site": 5
+          }
+        },
+        {
+          "code": "outdoor",
+          "label": "户外/自然环境",
+          "tag_effects": {
+            "work_scene_tags.outdoor": 5
+          }
+        },
+        {
+          "code": "creative_studio",
+          "label": "设计/传媒/内容工作室",
+          "tag_effects": {
+            "work_scene_tags.creative_studio": 5
+          }
+        },
+        {
+          "code": "remote",
+          "label": "自由职业/远程办公",
+          "tag_effects": {
+            "work_scene_tags.remote_work": 5
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "H02",
+      "module": "工作场景",
+      "question": "你更希望未来工作节奏是？",
+      "type": "single_choice",
+      "required": true,
+      "options": [
+        {
+          "code": "fast",
+          "label": "快节奏、高成长、高回报",
+          "tag_effects": {
+            "risk_tolerance_tags.pressure_tolerance": 5,
+            "career_value_tags.long_term_growth": 5
+          }
+        },
+        {
+          "code": "balanced",
+          "label": "中等节奏，发展和生活平衡",
+          "tag_effects": {
+            "career_value_tags.work_life_balance": 4
+          }
+        },
+        {
+          "code": "stable",
+          "label": "稳定节奏，收入中等也可以",
+          "tag_effects": {
+            "career_value_tags.stability": 5
+          }
+        },
+        {
+          "code": "easy",
+          "label": "尽量轻松，不想太卷",
+          "tag_effects": {
+            "career_value_tags.work_life_balance": 5,
+            "constraint_tags.avoid_high_competition": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "H03",
+      "module": "工作场景",
+      "question": "你更能接受哪类工作内容？最多选 5 个。",
+      "type": "multi_select",
+      "required": true,
+      "max_select": 5,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "analyze_data",
+          "label": "分析数据",
+          "tag_effects": {
+            "interest_tags.data": 3
+          }
+        },
+        {
+          "code": "coding",
+          "label": "写代码",
+          "tag_effects": {
+            "interest_tags.code_system": 3
+          }
+        },
+        {
+          "code": "write_report",
+          "label": "写报告/材料",
+          "tag_effects": {
+            "interest_tags.text_expression": 2,
+            "ability_tags.language_expression": 1
+          }
+        },
+        {
+          "code": "customer",
+          "label": "和客户沟通",
+          "tag_effects": {
+            "interest_tags.people": 2,
+            "interest_tags.business": 2
+          }
+        },
+        {
+          "code": "care_help",
+          "label": "照顾/帮助他人",
+          "tag_effects": {
+            "interest_tags.people": 3,
+            "career_value_tags.social_value": 2
+          }
+        },
+        {
+          "code": "teach",
+          "label": "讲课/培训",
+          "tag_effects": {
+            "work_scene_tags.school": 3,
+            "ability_tags.communication": 2
+          }
+        },
+        {
+          "code": "experiment",
+          "label": "做实验",
+          "tag_effects": {
+            "learning_style_tags.research_learning": 3
+          }
+        },
+        {
+          "code": "design",
+          "label": "设计图像/视频/空间",
+          "tag_effects": {
+            "interest_tags.art_design": 3
+          }
+        },
+        {
+          "code": "project_manage",
+          "label": "管理项目",
+          "tag_effects": {
+            "ability_tags.communication": 2,
+            "interest_tags.business": 1
+          }
+        },
+        {
+          "code": "law_contract",
+          "label": "处理合同/规则/法律问题",
+          "tag_effects": {
+            "interest_tags.law_rules": 3
+          }
+        },
+        {
+          "code": "maintain_engineering",
+          "label": "维护设备/工程系统",
+          "tag_effects": {
+            "interest_tags.machine": 3
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "H04",
+      "module": "工作场景",
+      "question": "你最不想做哪类工作？最多选 5 个。",
+      "type": "multi_select",
+      "required": false,
+      "max_select": 5,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "writing_code",
+          "label": "写代码",
+          "tag_effects": {
+            "exclusion_tags.no_programming": 1
+          }
+        },
+        {
+          "code": "sales",
+          "label": "销售",
+          "tag_effects": {
+            "exclusion_tags.no_sales": 1
+          }
+        },
+        {
+          "code": "teaching",
+          "label": "当老师",
+          "tag_effects": {
+            "exclusion_tags.no_teaching": 1
+          }
+        },
+        {
+          "code": "medicine",
+          "label": "学医/医院环境",
+          "tag_effects": {
+            "exclusion_tags.no_medicine": 1
+          }
+        },
+        {
+          "code": "civil_service",
+          "label": "考公考编",
+          "tag_effects": {
+            "exclusion_tags.no_public_exam": 1
+          }
+        },
+        {
+          "code": "factory_site",
+          "label": "去工厂/现场",
+          "tag_effects": {
+            "exclusion_tags.no_factory_site": 1
+          }
+        },
+        {
+          "code": "overtime",
+          "label": "长期加班",
+          "tag_effects": {
+            "exclusion_tags.no_high_overtime": 1
+          }
+        },
+        {
+          "code": "long_study",
+          "label": "长期读研读博",
+          "tag_effects": {
+            "exclusion_tags.no_long_training": 1
+          }
+        },
+        {
+          "code": "memorization",
+          "label": "大量背诵",
+          "tag_effects": {
+            "exclusion_tags.no_heavy_memory": 1
+          }
+        },
+        {
+          "code": "design",
+          "label": "做设计",
+          "tag_effects": {
+            "exclusion_tags.no_design": 1
+          }
+        },
+        {
+          "code": "research",
+          "label": "做实验科研",
+          "tag_effects": {
+            "exclusion_tags.no_research": 1
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "H05",
+      "module": "工作场景",
+      "question": "你对经常出差、外勤、现场工作的接受程度？",
+      "type": "scale_1_5",
+      "required": true,
+      "target_tag": "risk_tolerance_tags.travel_fieldwork_tolerance"
+    },
+    {
+      "id": "I01",
+      "module": "排除条件",
+      "question": "以下哪些方向你明确不想选？",
+      "type": "multi_select",
+      "required": false,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "medicine",
+          "label": "医学类",
+          "tag_effects": {
+            "exclusion_tags.no_medicine": 1
+          }
+        },
+        {
+          "code": "computer",
+          "label": "计算机/编程类",
+          "tag_effects": {
+            "exclusion_tags.no_programming": 1
+          }
+        },
+        {
+          "code": "education",
+          "label": "师范教育类",
+          "tag_effects": {
+            "exclusion_tags.no_teaching": 1
+          }
+        },
+        {
+          "code": "law",
+          "label": "法学类",
+          "tag_effects": {
+            "exclusion_tags.no_law": 1
+          }
+        },
+        {
+          "code": "finance",
+          "label": "财经金融类",
+          "tag_effects": {
+            "exclusion_tags.no_finance": 1
+          }
+        },
+        {
+          "code": "manufacturing",
+          "label": "机械/制造类",
+          "tag_effects": {
+            "exclusion_tags.no_manufacturing": 1
+          }
+        },
+        {
+          "code": "electronics",
+          "label": "电子信息类",
+          "tag_effects": {
+            "exclusion_tags.no_electronics": 1
+          }
+        },
+        {
+          "code": "agriculture_food",
+          "label": "农业食品类",
+          "tag_effects": {
+            "exclusion_tags.no_agriculture": 1
+          }
+        },
+        {
+          "code": "media",
+          "label": "传媒内容类",
+          "tag_effects": {
+            "exclusion_tags.no_media": 1
+          }
+        },
+        {
+          "code": "design",
+          "label": "设计艺术类",
+          "tag_effects": {
+            "exclusion_tags.no_design": 1
+          }
+        },
+        {
+          "code": "management",
+          "label": "管理类",
+          "tag_effects": {
+            "exclusion_tags.no_management": 1
+          }
+        },
+        {
+          "code": "foreign_language",
+          "label": "外语类",
+          "tag_effects": {
+            "exclusion_tags.no_foreign_language": 1
+          }
+        },
+        {
+          "code": "basic_science",
+          "label": "基础学科类",
+          "tag_effects": {
+            "exclusion_tags.no_basic_science": 1
+          }
+        },
+        {
+          "code": "none",
+          "label": "都可以考虑"
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "I02",
+      "module": "排除条件",
+      "question": "以下哪些工作状态你明确不能接受？",
+      "type": "multi_select",
+      "required": false,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "overtime",
+          "label": "高强度加班",
+          "tag_effects": {
+            "exclusion_tags.no_high_overtime": 1
+          }
+        },
+        {
+          "code": "income_volatility",
+          "label": "收入波动大",
+          "tag_effects": {
+            "constraint_tags.avoid_income_volatility": 1
+          }
+        },
+        {
+          "code": "long_study",
+          "label": "长期读研读博",
+          "tag_effects": {
+            "exclusion_tags.no_long_training": 1
+          }
+        },
+        {
+          "code": "certificate",
+          "label": "长期考证",
+          "tag_effects": {
+            "exclusion_tags.no_long_certificate": 1
+          }
+        },
+        {
+          "code": "sales_customer",
+          "label": "长期销售/客户沟通",
+          "tag_effects": {
+            "exclusion_tags.no_sales": 1
+          }
+        },
+        {
+          "code": "coding",
+          "label": "长期写代码",
+          "tag_effects": {
+            "exclusion_tags.no_programming": 1
+          }
+        },
+        {
+          "code": "memorization",
+          "label": "长期背诵材料",
+          "tag_effects": {
+            "exclusion_tags.no_heavy_memory": 1
+          }
+        },
+        {
+          "code": "hospital",
+          "label": "长期在医院工作",
+          "tag_effects": {
+            "exclusion_tags.no_hospital": 1
+          }
+        },
+        {
+          "code": "school",
+          "label": "长期在学校工作",
+          "tag_effects": {
+            "exclusion_tags.no_school": 1
+          }
+        },
+        {
+          "code": "factory",
+          "label": "长期在工厂/现场工作",
+          "tag_effects": {
+            "exclusion_tags.no_factory_site": 1
+          }
+        },
+        {
+          "code": "big_city",
+          "label": "岗位集中在大城市",
+          "tag_effects": {
+            "constraint_tags.avoid_big_city_concentration": 1
+          }
+        },
+        {
+          "code": "unclear_path",
+          "label": "就业路径不清晰",
+          "tag_effects": {
+            "constraint_tags.avoid_unclear_path": 1
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "I03",
+      "module": "排除条件",
+      "question": "你希望系统推荐时优先避开什么？最多选 3 个。",
+      "type": "multi_select",
+      "required": false,
+      "max_select": 3,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "unstable_employment",
+          "label": "就业不稳定",
+          "tag_effects": {
+            "constraint_tags.avoid_unstable_employment": 1
+          }
+        },
+        {
+          "code": "low_income_ceiling",
+          "label": "收入上限低",
+          "tag_effects": {
+            "constraint_tags.avoid_low_income_ceiling": 1
+          }
+        },
+        {
+          "code": "too_competitive",
+          "label": "太卷",
+          "tag_effects": {
+            "constraint_tags.avoid_high_competition": 1
+          }
+        },
+        {
+          "code": "need_master",
+          "label": "需要读研才好就业",
+          "tag_effects": {
+            "constraint_tags.avoid_master_required": 1
+          }
+        },
+        {
+          "code": "family_resource",
+          "label": "太依赖家庭资源",
+          "tag_effects": {
+            "constraint_tags.avoid_family_resource_dependence": 1
+          }
+        },
+        {
+          "code": "not_local",
+          "label": "不适合回本地",
+          "tag_effects": {
+            "constraint_tags.avoid_not_local_friendly": 1
+          }
+        },
+        {
+          "code": "unclear_path",
+          "label": "专业路径模糊",
+          "tag_effects": {
+            "constraint_tags.avoid_unclear_path": 1
+          }
+        },
+        {
+          "code": "ai_risk",
+          "label": "容易被 AI 替代",
+          "tag_effects": {
+            "constraint_tags.avoid_ai_substitution_risk": 1
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "I04",
+      "module": "排除条件",
+      "question": "是否有家长、地区、身体条件、家庭行业资源等会影响专业选择的特殊情况？可以填写，没有则留空。",
+      "type": "free_text",
+      "required": false,
+      "max_length": 500,
+      "tag_hint": "raw_special_constraints"
+    },
+    {
+      "id": "I05",
+      "module": "排除条件",
+      "question": "你最希望推荐结果额外说明什么？",
+      "type": "multi_select",
+      "required": false,
+      "allow_custom_option": true,
+      "options": [
+        {
+          "code": "salary",
+          "label": "薪资上限和风险",
+          "tag_effects": {
+            "constraint_tags.output_salary_detail": 1
+          }
+        },
+        {
+          "code": "employment",
+          "label": "就业岗位和城市",
+          "tag_effects": {
+            "constraint_tags.output_employment_detail": 1
+          }
+        },
+        {
+          "code": "study_path",
+          "label": "大学四年学习路径",
+          "tag_effects": {
+            "constraint_tags.output_learning_path": 1
+          }
+        },
+        {
+          "code": "civil_service",
+          "label": "考公考编适配度",
+          "tag_effects": {
+            "constraint_tags.output_public_sector_fit": 1
+          }
+        },
+        {
+          "code": "avoid_pitfall",
+          "label": "避坑理由",
+          "tag_effects": {
+            "constraint_tags.output_avoid_pitfall": 1
+          }
+        },
+        {
+          "code": "parents_explanation",
+          "label": "给家长看的解释",
+          "tag_effects": {
+            "constraint_tags.output_parent_friendly": 1
+          }
+        },
+        {
+          "code": "other",
+          "label": "其他，请填写",
+          "allow_custom_text": true,
+          "tag_effects": {
+            "custom_raw_text": 1
+          }
+        }
+      ]
+    }
+  ]
+}

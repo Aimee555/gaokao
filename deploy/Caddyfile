@@ -1,0 +1,29 @@
+# Caddy 配置：一台 ECS 上同时托管前端静态文件 + 反代后端 API，自动签发并续期 HTTPS 证书。
+# 前端与 /api 同源同域名 —— 无需 CORS、无混合内容问题、只需一个域名一张证书。
+#
+# 用法：
+#   1) 把 your-domain.com 改成你已备案、且 A 记录已指向本机公网 IP 的域名
+#   2) 把 root 路径改成你实际放前端 dist 的位置
+#   3) caddy run --config ./Caddyfile   （或交给 systemd 托管 caddy）
+
+your-domain.com {
+	encode gzip zstd
+
+	# /api/* 与 /health 反代到本机后端（后端只监听 127.0.0.1，不对公网暴露）
+	@backend path /api/* /health
+	handle @backend {
+		reverse_proxy 127.0.0.1:8787
+	}
+
+	# 其余路径交给前端静态站点；SPA 路由回退到 index.html
+	handle {
+		root * /var/www/gaokao/frontend/dist
+		try_files {path} /index.html
+		file_server
+	}
+
+	# 可选：把访问日志单独留存
+	log {
+		output file /var/log/caddy/gaokao-access.log
+	}
+}

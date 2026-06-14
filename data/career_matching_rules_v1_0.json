@@ -1,0 +1,824 @@
+{
+  "metadata": {
+    "project": "gaokao_major_recommendation",
+    "file_name": "career_matching_rules_v1_0.json",
+    "version": "1.0.0",
+    "language": "zh-CN",
+    "created_at": "2026-06-08 13:31:48",
+    "description": "职业路径匹配规则文件。用于将学生画像、产业推荐结果、职业路径库进行匹配，输出职业路径Top N。",
+    "input_files": [
+      "student_profile_output.json",
+      "industry_recommendation_result.json",
+      "career_path_library_v1_1_merged.json"
+    ],
+    "output_file": "career_recommendation_result.json",
+    "core_goal": "把产业推荐结果进一步收敛到具体职业路径，为后续专业推荐提供依据。",
+    "updated_at": "2026-06-08",
+    "update_note_v1_0_1": "与 careerMatcher 实现对齐（沿用产业层已验证的加固范式）：A) career_market_score 的 market_scores 为1-5分制，须经 (x-1)/4*100 映射到0-100，否则被0-100的career_match_score淹没；B) 标签匹配按组区分：能力/风险/学历=门槛型(达标即满分，能力溢出不扣分)，兴趣=对称型，职业价值=需求加权并集供给型(默认供给2.5)——不再像初稿对所有维度用对称公式；C) 惩罚按 root_cause 去重(同根因取最大)，非硬惩罚去重后封顶 max_non_hard_penalty=40，硬排除(70)全额并入not_recommended；D) education_gate 的 accept_master/accept_phd<=2 仅在标签已知(>0)时触发，未知(0)不罚(0=未知不代表排斥)；E) 选科类 subject_xxx==false 在职业阶段只产生预警，硬过滤交专业库；F) risk_notes 去重并去掉与honest_note重复项、裁剪到5条，honest_note单独展示；G) 辅助标签(learning_style/work_scene)仅统计已作答项，未作答不加分，总附加封顶+5；H) 公考职业用 not_recommended_if 含 no_public_exam 或归属考公产业来判定，替代脆弱的硬编码职业名清单(原清单含不存在的'教师编')；I) deep_study 与 not_recommended 互斥(因需读研被降级的职业归deep_study，不再同时出现在不推荐)；J) 动态追问触发由规则引擎确定性检测并输出 followup_questions，AI只负责提问与解释；K) 清理职业库中无法被问卷采集的死条件 exclusion_tags.no_civil_service。",
+    "design_principle": [
+      "产业层负责确定大方向，职业层负责判断未来更适合做什么工作。",
+      "职业路径层比产业层更具体，因此能力匹配权重要高于产业层。",
+      "规则引擎负责候选生成、算分、排序、排除；AI负责追问、解释、冲突识别和展示优化。",
+      "不允许AI直接修改rule_score，但允许AI输出display_adjustment建议。",
+      "本科就业优先的学生，不应主推undergrad_feasibility过低或min_education为硕博为主的职业。",
+      "职业路径推荐不是就业承诺，必须展示学历门槛、证书要求、真实风险和大学准备路径。"
+    ]
+  },
+  "input_schema": {
+    "student_profile": {
+      "required_groups": [
+        "career_value_tags",
+        "interest_tags",
+        "ability_tags",
+        "risk_tolerance_tags",
+        "education_plan_tags",
+        "exclusion_tags",
+        "constraint_tags"
+      ],
+      "optional_groups": [
+        "learning_style_tags",
+        "work_scene_tags",
+        "profile_type",
+        "profile_summary",
+        "followup_answers"
+      ],
+      "numeric_tag_scale": {
+        "min": 0,
+        "max": 5,
+        "note": "0表示未知，不代表排斥；1表示很低；5表示很高。"
+      },
+      "boolean_tag_rule": {
+        "true": "命中排除或约束",
+        "false": "未命中"
+      }
+    },
+    "industry_recommendation_result": {
+      "required_fields": [
+        "recommended_industries"
+      ],
+      "recommended_industries_required_fields": [
+        "industry_id",
+        "industry_name",
+        "score",
+        "level"
+      ],
+      "recommended_usage": "职业路径候选默认只从产业Top3/Top5中选取，避免职业推荐脱离产业方向。"
+    },
+    "career_path_library": {
+      "required_fields_per_career": [
+        "career_id",
+        "career_name",
+        "industry_ids",
+        "entry_majors",
+        "min_education",
+        "scores",
+        "match_tags",
+        "market_scores",
+        "not_recommended_if",
+        "risk_notes",
+        "honest_note",
+        "development_path"
+      ],
+      "display_fields": [
+        "career_name",
+        "aliases",
+        "entry_majors",
+        "min_education",
+        "license_required",
+        "employer_types",
+        "career_ladder",
+        "scores",
+        "work_scene",
+        "honest_note",
+        "development_path"
+      ],
+      "algorithm_fields": [
+        "match_tags",
+        "market_scores",
+        "not_recommended_if",
+        "risk_notes",
+        "related_majors"
+      ]
+    }
+  },
+  "candidate_generation_rules": {
+    "default_industry_scope": {
+      "use_top_n_industries": 5,
+      "main_scope_top_n_industries": 3,
+      "description": "默认先从产业推荐Top5中取职业候选；展示Top3产业时，优先展示Top3产业下的职业。"
+    },
+    "career_candidate_source": [
+      {
+        "source": "career.industry_ids intersects recommended_industry_ids",
+        "weight": "primary",
+        "description": "职业所属产业命中推荐产业时，进入候选集。"
+      },
+      {
+        "source": "industry_career_index",
+        "weight": "primary",
+        "description": "如果职业库含industry_career_index，优先用该索引快速获取产业下职业。"
+      },
+      {
+        "source": "career.aliases",
+        "weight": "supporting",
+        "description": "别名用于兼容产业库和前端展示，不单独生成新职业。"
+      }
+    ],
+    "out_of_scope_career_rule": {
+      "rule": "不在产业Top5所属industry_ids中的职业默认不进入候选集。",
+      "exception": [
+        "学生强烈命中public_sector或stability时，可允许IND_PUBLIC_SECTOR_EXAM_STABLE_EMPLOYMENT下职业进入候选备选。",
+        "学生明确选择某个职业或专业自由填写时，可把对应职业作为补充候选，但必须标注为用户指定方向。"
+      ]
+    },
+    "candidate_limit": {
+      "max_candidates_before_scoring": 60,
+      "description": "候选过多时，按所属产业rank和职业undergrad_feasibility预筛。"
+    }
+  },
+  "score_formula": {
+    "final_score": {
+      "formula": "final_score = career_match_score*0.75 + career_market_score*0.25 + industry_relevance_bonus - exclusion_penalty - education_penalty - constraint_penalty",
+      "min_score": 0,
+      "max_score": 100,
+      "rounding": "round_to_integer",
+      "note": "职业路径层以画像匹配为主，市场分为辅。"
+    },
+    "career_match_score": {
+      "formula": "industry_relevance*0.20 + career_value_match*0.20 + interest_match*0.20 + ability_match*0.25 + risk_tolerance_match*0.10 + education_plan_match*0.05",
+      "scale": "0-100",
+      "dimension_weights": {
+        "industry_relevance": 0.2,
+        "career_value_match": 0.2,
+        "interest_match": 0.2,
+        "ability_match": 0.25,
+        "risk_tolerance_match": 0.1,
+        "education_plan_match": 0.05
+      },
+      "rationale": "职业比产业更具体，能力匹配权重最高。"
+    },
+    "career_market_score": {
+      "formula": "job_volume_score*0.20 + undergrad_employment_score*0.25 + salary_potential_score*0.20 + stability_score*0.15 + ai_resilience_score*0.10 + entry_salary_score*0.10",
+      "scale": "0-100",
+      "base_weights": {
+        "job_volume_score": 0.2,
+        "undergrad_employment_score": 0.25,
+        "salary_potential_score": 0.2,
+        "stability_score": 0.15,
+        "ai_resilience_score": 0.1,
+        "entry_salary_score": 0.1
+      },
+      "ai_resilience_score_rule": {
+        "source": "market_scores.ai_substitution_risk or scores.ai_substitution_risk",
+        "formula": "ai_resilience_score = 6 - ai_substitution_risk"
+      },
+      "scale_conversion_note": "market_scores 为1-5分制，加权平均后仍在1-5区间，必须用 (x-1)/4*100 线性映射到0-100，再参与 final_score。ai_resilience_score 先按 6-ai_substitution_risk 转换后再加权。"
+    },
+    "industry_relevance": {
+      "rule": "职业所属产业在产业推荐结果中的排名越高，产业相关性越高。",
+      "rank_scores": {
+        "rank_1": 100,
+        "rank_2": 92,
+        "rank_3": 85,
+        "rank_4": 75,
+        "rank_5": 68,
+        "other": 40
+      },
+      "if_multiple_industries": "取命中的最高rank_scores"
+    },
+    "industry_relevance_bonus": {
+      "rule": "若职业同时命中多个推荐产业，可获得少量复合加分。",
+      "bonus_per_extra_matched_industry": 2,
+      "max_bonus": 6
+    }
+  },
+  "tag_match_rules": {
+    "single_numeric_tag_match": {
+      "formula": "match = 1 - abs(student_value - career_required_value) / 4",
+      "formula_by_group": {
+        "threshold_type": {
+          "applies_to": ["ability_tags.*", "risk_tolerance_tags.*", "education_plan_tags.*"],
+          "formula": "match = 1 if student_value >= career_value else 1 - (career_value - student_value)/4",
+          "rationale": "门槛型：能力/风险/学历达标即满分，能力溢出不应扣分（初稿对全维度用对称公式会误罚高能力学生）。"
+        },
+        "symmetric_type": {
+          "applies_to": ["interest_tags.*"],
+          "formula": "match = 1 - abs(student_value - career_value)/4"
+        },
+        "provision_type": {
+          "applies_to": ["career_value_tags.*"],
+          "formula": "match = 1 - max(0, student_value - career_supply)/4，遍历学生career_value标签并集，按student_value加权，职业未声明的价值按默认供给2.5处理。",
+          "rationale": "价值匹配回答'学生最在乎的，这个职业给不给得起'，避免高供给职业通吃，也让低薪职业对高收入诉求学生扣分。"
+        }
+      },
+      "clamp": {
+        "min": 0,
+        "max": 1
+      },
+      "score_conversion": "match * 100"
+    },
+    "unknown_student_tag_strategy": {
+      "student_value_0": {
+        "strategy": "neutral_low_confidence",
+        "default_match": 0.55,
+        "note": "0表示未知，不按最低分处理，避免未采集标签误伤推荐。"
+      }
+    },
+    "dimension_group_mapping": {
+      "career_value_match": "career_value_tags.*",
+      "interest_match": "interest_tags.*",
+      "ability_match": "ability_tags.*",
+      "risk_tolerance_match": "risk_tolerance_tags.*",
+      "education_plan_match": "education_plan_tags.*"
+    },
+    "supporting_groups": {
+      "learning_style_tags": {
+        "handling": "supporting_bonus",
+        "max_bonus_to_related_dimension": 5,
+        "description": "学习方式标签作为能力和学历规划的辅助证据。"
+      },
+      "work_scene_tags": {
+        "handling": "supporting_bonus",
+        "max_bonus_to_related_dimension": 5,
+        "description": "工作场景标签作为风险和兴趣匹配的辅助证据。"
+      }
+    }
+  },
+  "education_gate_rules": {
+    "description": "根据min_education、scores.undergrad_feasibility和学生学历规划控制职业是否进入主推。",
+    "missing_value_guard": "涉及 accept_master<=2 / accept_phd<=2 的学历惩罚仅在该标签已知(>0)时触发；标签未采集(0)不罚，改由动态追问 undergrad_vs_deep_study_conflict 消歧（0=未知不代表排斥）。",
+    "dedup_note": "master_required_penalty / phd_required_penalty 与 not_recommended_if 的 avoid_master_required 同属 root_cause=advanced_degree，去重只取最大；public_exam 相关的 gate 与 no_public_exam 同属 root_cause=public_exam。",
+    "rules": [
+      {
+        "rule_code": "undergrad_first_hide_deep_study",
+        "condition": "student.education_plan_tags.prefer_undergrad_employment >= 4 and career.scores.undergrad_feasibility <= 2",
+        "action": "move_to_deep_study_paths",
+        "penalty": 35,
+        "reason": "学生本科就业优先，但该职业本科入行可行性低。"
+      },
+      {
+        "rule_code": "master_required_penalty",
+        "condition": "career.min_education in ['硕士优先', '硕博为主'] and student.education_plan_tags.accept_master <= 2",
+        "action": "strong_penalty",
+        "penalty": 30,
+        "reason": "职业学历门槛较高，但学生不愿读研。"
+      },
+      {
+        "rule_code": "phd_required_penalty",
+        "condition": "career.min_education == '硕博为主' and student.education_plan_tags.accept_phd <= 2",
+        "action": "move_to_deep_study_paths",
+        "penalty": 40,
+        "reason": "职业偏硕博路径，学生不接受读博或科研深造。"
+      },
+      {
+        "rule_code": "license_required_warning",
+        "condition": "career.license_required != null and student.learning_style_tags.certificate_learning <= 2",
+        "action": "warning_penalty",
+        "penalty": 12,
+        "reason": "职业需要资格证或长期考证，但学生考证接受度低。"
+      },
+      {
+        "rule_code": "public_exam_required_warning",
+        "condition": "career.career_name in ['公务员','事业单位职员','教师编','中小学教师','国企央企综合岗','国企技术岗'] and student.exclusion_tags.no_public_exam == true",
+        "action": "hard_exclusion",
+        "penalty": 70,
+        "reason": "学生明确不接受考公考编或体制路线。"
+      }
+    ]
+  },
+  "exclusion_and_penalty_rules": {
+    "description": "职业库not_recommended_if与学生画像冲突时进行惩罚或排除。",
+    "default_action": "soft_penalty",
+    "penalty_aggregation": "所有命中惩罚(education_gate + not_recommended_if + market_adaptive)先按 root_cause 去重(同根因取最大)；硬排除(70)全额累加并使职业进入 not_recommended_careers；其余非硬惩罚去重后封顶 max_non_hard_penalty=40，再从 final_score 扣减。",
+    "max_non_hard_penalty": 40,
+    "subject_constraint_note": "subject_xxx==false 形式的选科条件在职业阶段不做命中惩罚，只在 risk_notes 追加预警，硬过滤交专业库阶段（与产业层一致；画像只存正向布尔标签，未选科=key缺失而非显式false）。",
+    "rule_types": {
+      "hard_exclusion": {
+        "penalty": 70,
+        "output_bucket": "not_recommended_careers",
+        "conditions": [
+          "exclusion_tags.no_medicine for medical roles",
+          "exclusion_tags.no_programming for programming-heavy roles",
+          "exclusion_tags.no_public_exam for public-sector exam roles",
+          "exclusion_tags.no_teaching for teacher roles"
+        ]
+      },
+      "strong_penalty": {
+        "penalty": 35,
+        "conditions": [
+          "exclusion_tags.no_long_training",
+          "exclusion_tags.no_factory_site",
+          "exclusion_tags.no_high_overtime",
+          "constraint_tags.avoid_master_required",
+          "constraint_tags.avoid_high_competition"
+        ]
+      },
+      "soft_penalty": {
+        "penalty": 18,
+        "conditions": [
+          "exclusion_tags.no_sales",
+          "exclusion_tags.no_design",
+          "exclusion_tags.no_media",
+          "constraint_tags.avoid_income_volatility",
+          "constraint_tags.avoid_ai_substitution_risk",
+          "constraint_tags.avoid_big_city_concentration"
+        ]
+      },
+      "warning_only": {
+        "penalty": 0,
+        "conditions": [
+          "career.honest_note contains strong warning but student does not explicitly reject it"
+        ]
+      }
+    },
+    "custom_condition_parser": {
+      "supports": [
+        "exclusion_tags.xxx",
+        "constraint_tags.xxx",
+        "education_plan_tags.xxx",
+        "learning_style_tags.xxx"
+      ],
+      "boolean_path_rule": "若路径值为true，则条件命中。",
+      "explicit_false_rule": "若条件形如 path==false，则路径值为false或缺失时命中。"
+    }
+  },
+  "market_adaptive_penalties": {
+    "competition_penalty": {
+      "condition": "market_scores.competition_level >= 4 and student.risk_tolerance_tags.competition_tolerance <= 2",
+      "penalty": 8,
+      "reason": "学生竞争承受度低，但职业竞争强。"
+    },
+    "city_concentration_penalty": {
+      "condition": "market_scores.city_concentration >= 4 and (student.risk_tolerance_tags.big_city_tolerance <= 2 or student.constraint_tags.avoid_big_city_concentration == true)",
+      "penalty": 8,
+      "reason": "学生不适合大城市集中岗位。"
+    },
+    "salary_expectation_penalty": {
+      "condition": "student.career_value_tags.high_income >= 4 and career.scores.salary_ceiling <= 3 and student.constraint_tags.avoid_low_income_ceiling == true",
+      "penalty": 10,
+      "reason": "学生重视高收入，但该职业收入上限一般。"
+    },
+    "stability_penalty": {
+      "condition": "student.career_value_tags.stability >= 4 and career.scores.stability <= 2",
+      "penalty": 10,
+      "reason": "学生重视稳定，但该职业稳定性较弱。"
+    },
+    "ai_substitution_penalty": {
+      "condition": "career.scores.ai_substitution_risk >= 4 and student.constraint_tags.avoid_ai_substitution_risk == true",
+      "penalty": 10,
+      "reason": "学生希望规避AI替代风险，但该职业替代风险较高。"
+    }
+  },
+  "output_level_rules": {
+    "A": {
+      "min_score": 85,
+      "max_score": 100,
+      "label": "强推荐",
+      "description": "职业路径与画像高度匹配，学历门槛和风险基本可接受。"
+    },
+    "B": {
+      "min_score": 70,
+      "max_score": 84,
+      "label": "可考虑",
+      "description": "整体匹配较好，但存在一定学历、竞争、城市或能力门槛。"
+    },
+    "C": {
+      "min_score": 55,
+      "max_score": 69,
+      "label": "谨慎考虑",
+      "description": "有一定相关性，但不应作为主推，需要进一步确认。"
+    },
+    "D": {
+      "min_score": 0,
+      "max_score": 54,
+      "label": "不推荐",
+      "description": "匹配度低或与排除条件明显冲突。"
+    }
+  },
+  "ranking_rules": {
+    "default_top_n": 8,
+    "main_output_top_n": 5,
+    "per_industry_display_limit": 5,
+    "deep_study_display_limit": 3,
+    "not_recommended_display_limit": 5,
+    "tie_breakers": [
+      {
+        "field": "final_score",
+        "order": "desc"
+      },
+      {
+        "field": "industry_relevance",
+        "order": "desc",
+        "description": "所属产业排名更高者优先。"
+      },
+      {
+        "field": "scores.undergrad_feasibility",
+        "order": "desc",
+        "condition": "student.education_plan_tags.prefer_undergrad_employment >= 4"
+      },
+      {
+        "field": "scores.stability",
+        "order": "desc",
+        "condition": "student.career_value_tags.stability >= 4"
+      },
+      {
+        "field": "scores.salary_ceiling",
+        "order": "desc",
+        "condition": "student.career_value_tags.high_income >= 4"
+      }
+    ],
+    "diversity_rules": {
+      "avoid_same_career_type_overcrowding": {
+        "enabled": true,
+        "max_same_category_in_top5": 3,
+        "description": "Top5中避免全部是同类职业，例如全部是软件开发或全部是公务员岗位。"
+      },
+      "include_stable_backup_when_needed": {
+        "enabled": true,
+        "condition": "student.career_value_tags.stability >= 4",
+        "description": "稳定性强需求用户，Top5中至少保留一个稳定路径备选。"
+      }
+    }
+  },
+  "output_buckets": {
+    "recommended_careers": {
+      "description": "最终展示的职业路径Top5。",
+      "source": "A/B类职业优先，必要时包含高分C类。"
+    },
+    "deep_study_paths": {
+      "description": "学历门槛较高但长期潜力高的职业，例如算法、量化、量子、生物研发、芯片设计等。",
+      "trigger_conditions": [
+        "min_education in ['硕士优先','硕博为主']",
+        "scores.undergrad_feasibility <= 2",
+        "education_gate_rules move_to_deep_study_paths"
+      ]
+    },
+    "backup_careers": {
+      "description": "可作为备选的职业路径，通常分数中等或与用户目标有一定冲突。",
+      "source": "B/C类职业"
+    },
+    "not_recommended_careers": {
+      "description": "被硬排除或明显不适配的职业路径。",
+      "source": "hard_exclusion or final_score < 55"
+    }
+  },
+  "reason_generation_rules": {
+    "matched_reason_count": {
+      "min": 3,
+      "max": 6
+    },
+    "risk_note_count": {
+      "min": 2,
+      "max": 5
+    },
+    "matched_reason_templates": {
+      "industry_relevance": "与你的推荐产业方向一致",
+      "career_value_tags.high_income": "匹配你的高收入目标",
+      "career_value_tags.stability": "匹配你的稳定就业目标",
+      "career_value_tags.technical_barrier": "匹配你的技术壁垒目标",
+      "career_value_tags.undergrad_employment": "本科就业路径相对清晰",
+      "career_value_tags.public_sector": "匹配体制内/国企/编制倾向",
+      "interest_tags.code_system": "代码/系统兴趣较强",
+      "interest_tags.data": "数据分析兴趣较强",
+      "interest_tags.machine": "机器设备和工程系统兴趣较强",
+      "interest_tags.life_health": "生命健康兴趣较强",
+      "interest_tags.business": "商业和运营兴趣较强",
+      "interest_tags.people": "愿意与人沟通和服务",
+      "interest_tags.text_expression": "文字表达和内容兴趣较强",
+      "interest_tags.law_rules": "法律规则兴趣较强",
+      "ability_tags.math": "数学能力匹配",
+      "ability_tags.logic": "逻辑能力匹配",
+      "ability_tags.programming_acceptance": "编程接受度较高",
+      "ability_tags.language_expression": "写作表达能力匹配",
+      "ability_tags.communication": "沟通表达能力匹配",
+      "ability_tags.chemistry_biology": "化学生物基础匹配",
+      "learning_style_tags.project_learning": "适合项目和作品驱动型成长",
+      "learning_style_tags.exam_learning": "适合考试和资格路径",
+      "education_plan_tags.accept_master": "能够接受继续深造",
+      "education_plan_tags.prefer_undergrad_employment": "本科就业诉求匹配"
+    },
+    "conflict_reason_templates": {
+      "exclusion_tags.no_programming": "你明确排斥编程，因此不建议把强编程职业作为主路径。",
+      "exclusion_tags.no_medicine": "你明确排斥医学或医院环境，因此医疗相关职业不作为主推。",
+      "exclusion_tags.no_teaching": "你明确不想当老师，因此教师类路径不作为主推。",
+      "exclusion_tags.no_public_exam": "你明确不愿意考公考编，因此体制类路径不作为主推。",
+      "exclusion_tags.no_factory_site": "你不希望去工厂或工程现场，因此现场工程类职业需要谨慎。",
+      "exclusion_tags.no_long_training": "你不接受长期培养，因此深造和长周期职业需要谨慎。",
+      "constraint_tags.avoid_high_competition": "你希望规避高竞争，因此高强度竞争职业需要降级展示。",
+      "constraint_tags.avoid_master_required": "你希望规避读研依赖，因此硕士优先或硕博为主路径不作为主推。",
+      "constraint_tags.avoid_ai_substitution_risk": "你希望规避AI替代风险，因此基础内容、基础报表、基础设计等岗位需要谨慎。"
+    }
+  },
+  "agent_integration": {
+    "enabled": true,
+    "ai_should_not_do": [
+      "不直接修改rule_score",
+      "不新增职业库中不存在的职业",
+      "不推荐被exclusion_tags明确排除的职业",
+      "不编造薪资、就业率或岗位数量",
+      "不把硕博为主路径强推给本科就业优先学生"
+    ],
+    "ai_can_do": [
+      "判断职业路径结果是否存在明显冲突",
+      "生成2-5个动态追问",
+      "根据用户补充回答更新画像标签",
+      "对规则Top8做展示层复核",
+      "生成用户可读解释和家长版说明"
+    ],
+    "career_ai_review_input": [
+      "student_profile_output",
+      "industry_recommendation_result",
+      "career_rule_top8",
+      "career_path_library selected career objects"
+    ],
+    "career_ai_review_output_schema": {
+      "overall_judgment": "string",
+      "need_followup": "boolean",
+      "followup_questions": [
+        {
+          "question_id": "string",
+          "question": "string",
+          "type": "single_choice | multi_select | free_text",
+          "options": [
+            {
+              "code": "string",
+              "label": "string",
+              "tag_effects": "object"
+            }
+          ],
+          "purpose": "string"
+        }
+      ],
+      "career_reviews": [
+        {
+          "career_id": "string",
+          "rule_rank": "number",
+          "rule_score": "number",
+          "ai_action": "keep | downgrade_display | upgrade_display | warn_only | remove_from_display",
+          "suggested_display_level": "A | B | C | D",
+          "should_show_in_top5": "boolean",
+          "ai_reason": "string",
+          "user_facing_explanation": "string",
+          "risk_warning": "string"
+        }
+      ]
+    },
+    "allowed_ai_actions": {
+      "keep": {
+        "score_adjustment": 0,
+        "description": "保持规则结果。"
+      },
+      "warn_only": {
+        "score_adjustment": 0,
+        "description": "不改展示排序，只加强风险提示。"
+      },
+      "upgrade_display": {
+        "score_adjustment": 3,
+        "description": "仅在规则Top8内小幅上调展示优先级。"
+      },
+      "downgrade_display": {
+        "score_adjustment": -8,
+        "description": "展示层降级，但不改原始规则分。"
+      },
+      "remove_from_display": {
+        "score_adjustment": -30,
+        "description": "移出Top5展示，可放入谨慎或不推荐。"
+      }
+    }
+  },
+  "dynamic_followup_triggers": [
+    {
+      "trigger_code": "programming_uncertain_for_tech_paths",
+      "condition": "top_careers contains programming-heavy careers and student.ability_tags.programming_acceptance <= 3",
+      "question": "如果大学和未来工作需要长期写代码、做项目、调试系统，你能接受吗？",
+      "purpose": "区分计算机软件、AI应用、数据工程等路径是否应保留为主推。"
+    },
+    {
+      "trigger_code": "undergrad_vs_deep_study_conflict",
+      "condition": "top_careers contains min_education in ['硕士优先','硕博为主'] and student.education_plan_tags.prefer_undergrad_employment >= 4",
+      "question": "你更希望本科毕业直接就业，还是愿意为了更高上限读研/读博？",
+      "purpose": "决定算法、量化、科研、芯片设计、生物研发等路径是否进入主推。"
+    },
+    {
+      "trigger_code": "stability_vs_high_income_conflict",
+      "condition": "student.career_value_tags.high_income >= 4 and student.career_value_tags.stability >= 4",
+      "question": "如果高收入和稳定只能优先一个，你更看重哪一个？",
+      "purpose": "区分高薪技术/金融路径与考公、国企、电力、医疗等稳定路径。"
+    },
+    {
+      "trigger_code": "fieldwork_conflict",
+      "condition": "top_careers contains factory_site/fieldwork roles and student.exclusion_tags.no_factory_site is unknown",
+      "question": "你能接受工厂、工程现场、测试场或外勤工作吗？",
+      "purpose": "判断电气、自动化、制造、土木、无人机、新能源等路径是否适合。"
+    },
+    {
+      "trigger_code": "certificate_conflict",
+      "condition": "top_careers contains license_required and student.learning_style_tags.certificate_learning <= 3",
+      "question": "你能接受长期考证或资格考试吗？例如法考、教师资格、医师资格、CPA等。",
+      "purpose": "判断法学、医学、教师、会计审计、建筑造价等路径是否适合。"
+    },
+    {
+      "trigger_code": "public_sector_confirmation",
+      "condition": "top_careers contains public sector roles and student.career_value_tags.public_sector between 2 and 3",
+      "question": "你是否愿意把考公、事业编、国企央企作为主要就业路径之一？",
+      "purpose": "确认稳定体制路线是否进入职业Top5。"
+    }
+  ],
+  "followup_loop": {
+    "description": "动态追问闭环实现说明（careerMatcher + /api/ai-review）。",
+    "options_with_tag_effects": "每个 dynamic_followup_trigger 在引擎中携带可作答 options，每个 option 带 tag_effects（数值标签覆盖钳0-5，布尔标签置true）。例如 undergrad_vs_deep_study_conflict 的'本科就业为主'→{prefer_undergrad_employment:5, accept_master:2}。",
+    "refeed_contract": "前端把用户的追问回答以 followup_answers:[{trigger_code, selected_code}] 回传 /api/ai-review；后端用 applyFollowupAnswers 把选项 tag_effects 覆盖进画像，并把已答 trigger_code 计入 answeredTriggers，重跑 产业→职业→AI复核。已答追问不再透出，避免重复反问。",
+    "grounding_note": "只回灌目录内已知 trigger_code/selected_code 的 tag_effects；AI 自由提出的追问 options 为空，仅作澄清展示，其回答不自动改画像/打分（防止 AI 间接绕过 grounding 影响评分）。",
+    "verified_behavior": [
+      "选 stability_vs_high_income=income → stability 5→3，稳定型职业相应下沉；",
+      "选 fieldwork=reject → no_factory_site=true，现场工程岗(嵌入式/通信/射频等)被排除或降级；",
+      "选 public_sector_confirmation=no → no_public_exam=true 且 public_sector→1，体制类职业被硬排除，Top5 切换到非体制路径。"
+    ]
+  },
+  "output_schema": {
+    "student_id": "string",
+    "matcher_version": "string",
+    "source_industries": [
+      {
+        "industry_id": "string",
+        "industry_name": "string",
+        "industry_rank": "number",
+        "industry_score": "number"
+      }
+    ],
+    "recommended_careers": [
+      {
+        "rank": "number",
+        "career_id": "string",
+        "career_name": "string",
+        "score": "number 0-100",
+        "level": "A | B | C | D",
+        "level_label": "string",
+        "matched_industries": "array<string>",
+        "min_education": "string",
+        "license_required": "string|null",
+        "entry_majors": "array<string>",
+        "related_majors": "array<string>",
+        "employer_types": "array<string>",
+        "career_ladder": "string",
+        "work_scene": "array<string>",
+        "why_fit": "array<string>",
+        "honest_note": "string",
+        "risk_notes": "array<string>",
+        "development_path": "array<string>",
+        "debug_scores": {
+          "enabled": false,
+          "career_match_score": "number",
+          "career_market_score": "number",
+          "industry_relevance": "number",
+          "penalty_score": "number"
+        }
+      }
+    ],
+    "deep_study_paths": [
+      {
+        "career_id": "string",
+        "career_name": "string",
+        "reason": "string",
+        "min_education": "string",
+        "entry_majors": "array<string>"
+      }
+    ],
+    "backup_careers": [
+      {
+        "career_id": "string",
+        "career_name": "string",
+        "reason": "string"
+      }
+    ],
+    "not_recommended_careers": [
+      {
+        "career_id": "string",
+        "career_name": "string",
+        "reason": "string",
+        "conflict_tags": "array<string>"
+      }
+    ],
+    "followup_required": "boolean",
+    "followup_questions": "array<object>"
+  },
+  "test_expectations": [
+    {
+      "case_name": "高收入技术型 + AI软件产业Top1",
+      "expected_top_careers": [
+        "软件开发工程师",
+        "数据工程师",
+        "信息安全工程师",
+        "AI应用工程师"
+      ],
+      "deep_study_paths_may_include": [
+        "算法工程师",
+        "量化助理"
+      ]
+    },
+    {
+      "case_name": "稳定考公型",
+      "expected_top_careers": [
+        "公务员",
+        "事业单位职员",
+        "国企央企综合岗",
+        "教师编"
+      ],
+      "should_not_top": [
+        "软件开发工程师",
+        "游戏美术",
+        "量化助理"
+      ]
+    },
+    {
+      "case_name": "医疗长期主义型",
+      "expected_top_careers": [
+        "临床医生",
+        "口腔医生",
+        "护理师",
+        "康复治疗师"
+      ],
+      "should_not_top_if_no_medicine": [
+        "临床医生",
+        "口腔医生",
+        "护理师"
+      ]
+    },
+    {
+      "case_name": "本科就业优先 + 不愿读研",
+      "should_move_to_deep_study_paths": [
+        "量子算法研究员",
+        "量化助理",
+        "机器人算法工程师",
+        "芯片设计工程师"
+      ]
+    },
+    {
+      "case_name": "商业运营型",
+      "expected_top_careers": [
+        "电商运营",
+        "数字营销",
+        "供应链管理",
+        "品牌策划",
+        "外贸业务员"
+      ]
+    },
+    {
+      "case_name": "内容创意型",
+      "expected_top_careers": [
+        "新媒体与内容运营",
+        "短视频编导",
+        "品牌策划",
+        "UI/UX设计师"
+      ],
+      "risk_should_mention": [
+        "AI替代风险",
+        "作品集",
+        "行业波动"
+      ]
+    }
+  ],
+  "implementation_notes": [
+    "第一版先用规则引擎跑通职业Top5，不必马上接AI。",
+    "如果要做Agent，AI应放在规则Top8之后，做追问、复核和展示解释。",
+    "职业Top5跑通后，下一步建立major_library.json。",
+    "专业推荐时必须加入选科硬约束、专业目录、院校层次和地区因素。",
+    "前端展示时不展示debug_scores，除非是内部调试页面。",
+    "honest_note是用户信任关键字段，应保留并放在职业展开页明显位置。"
+  ],
+  "known_limitations": {
+    "description": "当前版本有意保留的设计权衡/数据局限，调参与建专业库时需留意。",
+    "items": [
+      {
+        "id": "diversity_category_granularity",
+        "issue": "diversity_rules.max_same_category_in_top5 需要职业'类别'，但库里没有category字段，实现用career_id第二段前缀代理。多数职业前缀各不相同（口腔/临床/药师/影像各自独立），导致'同类'识别过细、限流几乎不触发。",
+        "impact": "Top5可能出现5个都偏同一大类（如全是医疗或全是设计）的情况。",
+        "decision": "暂用前缀代理。正解是给职业库加显式 category 字段（如 软件研发/医疗临床/内容设计/公共部门），再按category限流。"
+      },
+      {
+        "id": "uncollectable_education_tags",
+        "issue": "education_plan_tags.accept_certificate 与 accept_public_exam 两份问卷都未采集；accept_phd 仅deep问卷有。",
+        "impact": "用到这些标签的 match_tag 维度恒为中性0.55；quick模式下 phd 相关学历门槛无法触发。",
+        "decision": "建议问卷补题，或在专业/学历确认环节单独追问。"
+      },
+      {
+        "id": "industry_relevance_double_count",
+        "issue": "industry_relevance 既作为 career_match_score 的一个维度(0.20)，又在 final_score 以 industry_relevance_bonus(<=6) 叠加。",
+        "impact": "产业排名对职业总分有放大效应（设计如此），命中多产业的职业更占优。",
+        "decision": "保留，符合'职业不脱离产业方向'的初衷；若发现头部产业职业过度通吃，可下调bonus上限。"
+      },
+      {
+        "id": "out_of_scope_careers_filtered",
+        "issue": "职业候选只取产业Top5所属industry_ids；归属未进Top5产业（尤其前沿产业，如机器人算法属EMBODIED_AI、量子算法属QUANTUM）的职业不进候选。",
+        "impact": "test_expectations中跨多前沿产业的职业可能因其产业未进当前画像Top5而不出现，属正常范围控制而非缺陷。",
+        "decision": "保留范围控制；高潜深造方向通过产业层frontier延伸位 + 职业层deep_study_paths覆盖。"
+      },
+      {
+        "id": "expected_top_may_land_in_backup",
+        "issue": "部分test_expectations列为top的职业（如护理师/康复治疗师/品牌策划/新媒体与内容运营）在按分排序后落到backup_careers。",
+        "impact": "与测试期望的'进Top5'有出入，但这些职业仍在候选集内（备选），未被错误排除。",
+        "decision": "属打分细节，非机制错误；如需保证其进Top5，应调整对应职业 match_tags 或权重，而非硬塞。"
+      }
+    ]
+  }
+}

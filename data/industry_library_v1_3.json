@@ -1,0 +1,1782 @@
+{
+  "metadata": {
+    "project": "gaokao_major_recommendation",
+    "file_name": "industry_library_v1_3.json",
+    "version": "1.3.0",
+    "language": "zh-CN",
+    "created_at": "2026-06-07 08:55:53",
+    "description": "高考专业推荐系统产业方向库。用于把学生画像标签匹配到产业方向、职业路径和专业大类。",
+    "design_principle": "兼顾国家十五五规划政策导向、当前就业市场可落地性、专业选择可解释性。MVP阶段先覆盖重点产业，不追求全量行业。",
+    "scoring_scale": {
+      "min": 1,
+      "max": 5,
+      "description": "1=低，3=中等，5=高。分值用于推荐排序，不代表绝对承诺。"
+    },
+    "industry_tiers": {
+      "employment_friendly": "当前就业岗位较多、职业路径较清晰，适合作为MVP主推荐方向。",
+      "policy_growth": "政策支持强、产业成长性好，但对学历、学校、城市或能力有一定要求。",
+      "future_frontier": "十五五未来产业或前沿方向，长期潜力高，但本科就业确定性通常较低，适合作为延伸方向或高潜学生推荐。"
+    },
+    "source_basis_summary": [
+      "十五五规划强调现代化产业体系、新质生产力、数智化/绿色化/融合化。",
+      "十五五未来产业方向包括量子科技、生物制造、氢能和核聚变能、脑机接口、具身智能、第六代移动通信。",
+      "当前就业友好度按岗位量、职业路径清晰度、本科就业可行性、稳定性、城市集中度等因素综合估计。"
+    ],
+    "updated_at": "2026-06-07 09:13:15",
+    "update_note": "v1.3校准：1) 建筑、城市更新与基础设施数字化由employment_friendly调整为policy_growth，本科就业分4→3，风险提示补充房地产下行与传统房建岗位收缩；2) 人工智能与软件信息服务补充学校层次敏感度提示；3) 未来产业条目与2026年3月发布的十五五规划纲要官方口径（量子科技、生物制造、氢能和核聚变能、脑机接口、具身智能、6G）核对一致。 ; v1.3校准：1) 为全部产业补齐industry_type（仅考公考编为employment_strategy，其余industrial_sector）；2) 删除IND_PUBLIC_SECTOR_EXAM中无法被问卷触发的死条件exclusion_tags.no_civil_service（与no_public_exam重复）。 ; v1.3.1收紧万金油：删除SILVER(business/education_growth/work_life_balance/memory)、PET(business/art_design/people/high_income/social_value)、CROSS_BORDER(text_expression/creativity/organization)中弱相关或过度声明的match_tags，保留各自核心区分标签，减少跨画像误匹配。",
+    "industry_count": 23,
+    "recommended_mvp_core_industries": [
+      "IND_PUBLIC_SECTOR_EXAM_STABLE_EMPLOYMENT",
+      "IND_AI_SOFTWARE",
+      "IND_NEW_ENERGY_POWER",
+      "IND_SMART_EV_CONNECTED_VEHICLE",
+      "IND_IC_ELECTRONICS",
+      "IND_ROBOTICS_SMART_MANUFACTURING",
+      "IND_BIOMED_HEALTHCARE",
+      "IND_SILVER_ECONOMY_ELDERCARE",
+      "IND_FINTECH_DATA_BUSINESS",
+      "IND_PUBLIC_EDUCATION_GOVERNANCE",
+      "IND_LEGAL_COMPLIANCE_SECURITY",
+      "IND_DIGITAL_CONTENT_DESIGN",
+      "IND_PET_ECONOMY_ANIMAL_HEALTH",
+      "IND_TRANSPORT_LOGISTICS_SUPPLY_CHAIN"
+    ]
+  },
+  "match_weights_recommended": {
+    "career_value_match": 0.3,
+    "interest_match": 0.25,
+    "ability_match": 0.2,
+    "risk_tolerance_match": 0.15,
+    "education_plan_match": 0.1
+  },
+  "industries": [
+    {
+      "industry_id": "IND_AI_SOFTWARE",
+      "industry_name": "人工智能与软件信息服务",
+      "tier": "employment_friendly",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "新质生产力",
+        "数智化赋能",
+        "人工智能",
+        "数字经济"
+      ],
+      "description": "覆盖软件开发、AI应用、数据工程、云计算、信息安全、企业数字化等方向，是岗位量较大、路径较清晰的技术类产业。",
+      "match_tags": {
+        "career_value_tags.high_income": 5,
+        "career_value_tags.technical_barrier": 5,
+        "career_value_tags.undergrad_employment": 4,
+        "career_value_tags.long_term_growth": 5,
+        "interest_tags.code_system": 5,
+        "interest_tags.data": 5,
+        "ability_tags.logic": 5,
+        "ability_tags.math": 4,
+        "ability_tags.programming_acceptance": 5,
+        "learning_style_tags.project_learning": 5,
+        "learning_style_tags.continuous_learning": 5,
+        "risk_tolerance_tags.competition_tolerance": 4,
+        "risk_tolerance_tags.overtime_tolerance": 3,
+        "risk_tolerance_tags.big_city_tolerance": 4
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 5,
+        "salary_potential_score": 5,
+        "undergrad_employment_score": 4,
+        "stability_score": 3,
+        "competition_level": 5,
+        "city_concentration": 5,
+        "master_requirement": 3,
+        "ai_substitution_risk": 3
+      },
+      "suitable_profile_types": [
+        "高收入技术型",
+        "研究深造型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_programming",
+        "exclusion_tags.no_high_overtime",
+        "constraint_tags.avoid_high_competition"
+      ],
+      "related_career_paths": [
+        "软件开发工程师",
+        "AI应用工程师",
+        "数据工程师",
+        "数据分析师",
+        "信息安全工程师",
+        "云计算工程师",
+        "测试开发工程师",
+        "产品经理"
+      ],
+      "related_majors": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "数据科学与大数据技术",
+        "信息安全",
+        "网络空间安全",
+        "物联网工程",
+        "智能科学与技术"
+      ],
+      "risk_notes": [
+        "竞争强",
+        "需要持续学习和项目经验",
+        "头部岗位对学校层次、实习经历和项目作品高度敏感，普通院校学生不应直接对标大厂薪资作为就业预期",
+        "优质岗位集中在一线和新一线城市",
+        "普通院校学生需要靠项目、实习、竞赛和作品集补强"
+      ],
+      "recommendation_note": "适合重视高收入、技术壁垒、数据/代码兴趣强且能接受竞争的学生。注意：本科就业可行性对学校层次敏感，普通院校学生需以项目、实习、竞赛补强，并合理设定起步薪资预期。"
+    },
+    {
+      "industry_id": "IND_IC_ELECTRONICS",
+      "industry_name": "集成电路与电子信息",
+      "tier": "policy_growth",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "战略性新兴产业",
+        "集成电路",
+        "电子信息",
+        "科技自立自强"
+      ],
+      "description": "覆盖芯片设计、半导体制造、通信设备、电子系统、嵌入式与硬件工程等方向，政策支持强、技术壁垒高。",
+      "match_tags": {
+        "career_value_tags.technical_barrier": 5,
+        "career_value_tags.long_term_growth": 5,
+        "career_value_tags.high_income": 4,
+        "interest_tags.machine": 4,
+        "interest_tags.code_system": 3,
+        "interest_tags.data": 3,
+        "ability_tags.math": 4,
+        "ability_tags.physics": 5,
+        "ability_tags.logic": 4,
+        "learning_style_tags.hard_learning_tolerance": 5,
+        "risk_tolerance_tags.competition_tolerance": 4,
+        "education_plan_tags.accept_master": 4
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 4,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 3,
+        "stability_score": 4,
+        "competition_level": 4,
+        "city_concentration": 4,
+        "master_requirement": 4,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "高收入技术型",
+        "工程制造型",
+        "研究深造型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_electronics",
+        "exclusion_tags.no_engineering",
+        "exclusion_tags.no_long_training"
+      ],
+      "related_career_paths": [
+        "芯片设计工程师",
+        "嵌入式工程师",
+        "硬件工程师",
+        "通信工程师",
+        "半导体工艺工程师",
+        "射频工程师"
+      ],
+      "related_majors": [
+        "电子信息工程",
+        "通信工程",
+        "微电子科学与工程",
+        "集成电路设计与集成系统",
+        "电子科学与技术",
+        "光电信息科学与工程"
+      ],
+      "risk_notes": [
+        "学习难度较高",
+        "较依赖学校平台和实验条件",
+        "部分高端岗位偏好研究生",
+        "产业链岗位差异大"
+      ],
+      "recommendation_note": "适合理工基础强、愿意学习硬科技、重视技术壁垒和长期成长的学生。"
+    },
+    {
+      "industry_id": "IND_NEW_ENERGY_POWER",
+      "industry_name": "新能源、电力与储能",
+      "tier": "employment_friendly",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "绿色化",
+        "新能源",
+        "新型电力系统",
+        "储能",
+        "双碳"
+      ],
+      "description": "覆盖新能源发电、电网、电气设备、储能、电力电子、能源管理等方向，兼具政策支持、实体产业和稳定就业属性。",
+      "match_tags": {
+        "career_value_tags.stability": 4,
+        "career_value_tags.technical_barrier": 4,
+        "career_value_tags.undergrad_employment": 4,
+        "career_value_tags.local_development": 4,
+        "interest_tags.machine": 4,
+        "ability_tags.physics": 4,
+        "ability_tags.math": 4,
+        "ability_tags.hands_on": 3,
+        "risk_tolerance_tags.big_city_tolerance": 3,
+        "work_scene_tags.factory_site": 3
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 4,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 4,
+        "stability_score": 4,
+        "competition_level": 3,
+        "city_concentration": 3,
+        "master_requirement": 3,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "工程制造型",
+        "稳定体制型",
+        "高收入技术型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_engineering",
+        "exclusion_tags.no_factory_site"
+      ],
+      "related_career_paths": [
+        "电气工程师",
+        "电网技术岗",
+        "新能源工程师",
+        "储能系统工程师",
+        "电力电子工程师",
+        "设备工程师"
+      ],
+      "related_majors": [
+        "电气工程及其自动化",
+        "新能源科学与工程",
+        "能源与动力工程",
+        "储能科学与工程",
+        "智能电网信息工程",
+        "自动化"
+      ],
+      "risk_notes": [
+        "部分岗位需要去电厂、电网、工厂或工程现场",
+        "不同城市和单位待遇差异较大",
+        "强电方向学习难度较高"
+      ],
+      "recommendation_note": "适合希望技术壁垒、稳定就业、本地/省内发展兼顾的理工学生。"
+    },
+    {
+      "industry_id": "IND_ROBOTICS_SMART_MANUFACTURING",
+      "industry_name": "机器人、智能制造与工业自动化",
+      "tier": "policy_growth",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "战略性新兴产业",
+        "机器人",
+        "智能制造",
+        "制造业数智化"
+      ],
+      "description": "覆盖工业机器人、自动化产线、智能装备、工业软件、数字孪生、机器视觉等方向，是制造业升级的重要支撑。",
+      "match_tags": {
+        "career_value_tags.technical_barrier": 5,
+        "career_value_tags.long_term_growth": 4,
+        "interest_tags.machine": 5,
+        "interest_tags.code_system": 3,
+        "interest_tags.data": 3,
+        "ability_tags.physics": 4,
+        "ability_tags.logic": 4,
+        "ability_tags.hands_on": 4,
+        "learning_style_tags.project_learning": 4,
+        "work_scene_tags.factory_site": 4,
+        "risk_tolerance_tags.travel_fieldwork_tolerance": 3
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 4,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 4,
+        "stability_score": 4,
+        "competition_level": 3,
+        "city_concentration": 3,
+        "master_requirement": 3,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "工程制造型",
+        "高收入技术型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_factory_site",
+        "exclusion_tags.no_manufacturing",
+        "exclusion_tags.no_engineering"
+      ],
+      "related_career_paths": [
+        "自动化工程师",
+        "机器人工程师",
+        "机械电子工程师",
+        "工业软件工程师",
+        "机器视觉工程师",
+        "设备工程师"
+      ],
+      "related_majors": [
+        "自动化",
+        "机器人工程",
+        "智能制造工程",
+        "机械电子工程",
+        "机械设计制造及其自动化",
+        "测控技术与仪器"
+      ],
+      "risk_notes": [
+        "部分岗位场景在工厂或工程现场",
+        "制造业岗位待遇差异明显",
+        "需要软硬件结合能力"
+      ],
+      "recommendation_note": "适合喜欢机器设备、动手实践和工程系统的学生。"
+    },
+    {
+      "industry_id": "IND_BIOMED_HEALTHCARE",
+      "industry_name": "医疗健康、生物医药与康养",
+      "tier": "employment_friendly",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "生物医药",
+        "健康中国",
+        "银发经济",
+        "民生福祉"
+      ],
+      "description": "覆盖临床医疗、口腔、医学影像、检验、药学、生物医药、护理、康复、养老健康服务等方向，稳定性和社会价值较强。",
+      "match_tags": {
+        "career_value_tags.stability": 5,
+        "career_value_tags.social_status": 4,
+        "career_value_tags.social_value": 5,
+        "interest_tags.life_health": 5,
+        "interest_tags.people": 3,
+        "ability_tags.memory": 4,
+        "ability_tags.chemistry_biology": 5,
+        "learning_style_tags.exam_learning": 4,
+        "learning_style_tags.certificate_learning": 4,
+        "education_plan_tags.accept_long_training": 5,
+        "risk_tolerance_tags.pressure_tolerance": 4,
+        "work_scene_tags.hospital": 5
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 4,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 3,
+        "stability_score": 5,
+        "competition_level": 4,
+        "city_concentration": 3,
+        "master_requirement": 4,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "医疗长期主义型",
+        "稳定体制型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_medicine",
+        "exclusion_tags.no_hospital",
+        "exclusion_tags.no_long_training",
+        "constraint_tags.subject_chemistry==false"
+      ],
+      "related_career_paths": [
+        "临床医生",
+        "口腔医生",
+        "医学影像技师/医生",
+        "检验技师",
+        "药师",
+        "护理师",
+        "康复治疗师",
+        "医药研发/注册"
+      ],
+      "related_majors": [
+        "临床医学",
+        "口腔医学",
+        "医学影像学",
+        "医学检验技术",
+        "药学",
+        "护理学",
+        "康复治疗学",
+        "生物医学工程"
+      ],
+      "risk_notes": [
+        "培养周期长",
+        "部分方向强依赖考研和资格证",
+        "医院工作压力较大",
+        "选科要求通常较严格"
+      ],
+      "recommendation_note": "适合重视稳定、社会价值、能接受长期学习和医院环境的学生。"
+    },
+    {
+      "industry_id": "IND_FINTECH_DATA_BUSINESS",
+      "industry_name": "金融科技、数据分析与商业服务",
+      "tier": "employment_friendly",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "数字经济",
+        "现代服务业",
+        "数据要素",
+        "产业融合"
+      ],
+      "description": "覆盖金融科技、数据分析、风控、会计审计、企业管理咨询、供应链和商业运营等方向，适合数理与商业结合型学生。",
+      "match_tags": {
+        "career_value_tags.high_income": 4,
+        "career_value_tags.long_term_growth": 4,
+        "career_value_tags.undergrad_employment": 3,
+        "interest_tags.business": 5,
+        "interest_tags.data": 4,
+        "interest_tags.people": 3,
+        "ability_tags.math": 4,
+        "ability_tags.logic": 4,
+        "ability_tags.communication": 3,
+        "learning_style_tags.certificate_learning": 3,
+        "risk_tolerance_tags.competition_tolerance": 4,
+        "risk_tolerance_tags.income_volatility_tolerance": 3,
+        "work_scene_tags.financial_institution": 4
+      },
+      "market_scores": {
+        "policy_support_score": 4,
+        "job_volume_score": 4,
+        "salary_potential_score": 5,
+        "undergrad_employment_score": 3,
+        "stability_score": 3,
+        "competition_level": 5,
+        "city_concentration": 5,
+        "master_requirement": 4,
+        "ai_substitution_risk": 3
+      },
+      "suitable_profile_types": [
+        "商业经营型",
+        "高收入技术型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_finance",
+        "exclusion_tags.no_sales",
+        "constraint_tags.avoid_family_resource_dependence",
+        "constraint_tags.avoid_big_city_concentration"
+      ],
+      "related_career_paths": [
+        "数据分析师",
+        "金融风控",
+        "量化助理",
+        "会计",
+        "审计",
+        "商业分析师",
+        "供应链管理",
+        "产品运营"
+      ],
+      "related_majors": [
+        "统计学",
+        "金融工程",
+        "金融学",
+        "会计学",
+        "审计学",
+        "经济学",
+        "数据科学与大数据技术",
+        "信息管理与信息系统"
+      ],
+      "risk_notes": [
+        "学校层次、城市和实习资源影响大",
+        "普通泛商科专业路径容易模糊",
+        "高端金融岗位竞争激烈"
+      ],
+      "recommendation_note": "适合兼具数学/数据能力、商业兴趣和竞争承受力的学生。"
+    },
+    {
+      "industry_id": "IND_PUBLIC_EDUCATION_GOVERNANCE",
+      "industry_name": "教育、公共服务与社会治理",
+      "tier": "employment_friendly",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "民生福祉",
+        "公共服务",
+        "教育强国",
+        "社会治理"
+      ],
+      "description": "覆盖教师、教育服务、公共管理、考公考编、基层治理、事业单位等方向，稳定性较好，适合稳定优先型学生。",
+      "match_tags": {
+        "career_value_tags.stability": 5,
+        "career_value_tags.public_sector": 5,
+        "career_value_tags.social_value": 4,
+        "career_value_tags.local_development": 4,
+        "interest_tags.people": 4,
+        "interest_tags.education_growth": 5,
+        "interest_tags.text_expression": 3,
+        "ability_tags.language_expression": 4,
+        "ability_tags.communication": 4,
+        "ability_tags.memory": 3,
+        "learning_style_tags.exam_learning": 4,
+        "education_plan_tags.accept_public_exam": 5,
+        "work_scene_tags.school": 4,
+        "work_scene_tags.government": 4
+      },
+      "market_scores": {
+        "policy_support_score": 4,
+        "job_volume_score": 4,
+        "salary_potential_score": 3,
+        "undergrad_employment_score": 4,
+        "stability_score": 5,
+        "competition_level": 4,
+        "city_concentration": 2,
+        "master_requirement": 3,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "稳定体制型",
+        "教育服务型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_teaching",
+        "exclusion_tags.no_public_exam",
+        "exclusion_tags.no_school"
+      ],
+      "related_career_paths": [
+        "中小学教师",
+        "公务员",
+        "事业单位职员",
+        "公共管理岗",
+        "教育产品/教研",
+        "社区治理岗"
+      ],
+      "related_majors": [
+        "汉语言文学",
+        "数学与应用数学",
+        "英语",
+        "思想政治教育",
+        "小学教育",
+        "学前教育",
+        "公共事业管理",
+        "行政管理"
+      ],
+      "risk_notes": [
+        "编制竞争不低",
+        "不同地区教师和事业单位机会差异大",
+        "收入上限一般低于高薪技术路线"
+      ],
+      "recommendation_note": "适合稳定优先、愿意考试、表达沟通较好、希望本地发展的学生。"
+    },
+    {
+      "industry_id": "IND_LEGAL_COMPLIANCE_SECURITY",
+      "industry_name": "法律、合规与数据安全治理",
+      "tier": "policy_growth",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "法治建设",
+        "数据安全",
+        "网络安全",
+        "平台治理",
+        "合规监管"
+      ],
+      "description": "覆盖法律服务、企业法务、知识产权、数据合规、网络安全合规、政府监管等方向，适合表达、记忆和规则意识较强的学生。",
+      "match_tags": {
+        "career_value_tags.stability": 4,
+        "career_value_tags.social_status": 4,
+        "career_value_tags.public_sector": 4,
+        "career_value_tags.technical_barrier": 3,
+        "interest_tags.law_rules": 5,
+        "interest_tags.text_expression": 4,
+        "ability_tags.language_expression": 5,
+        "ability_tags.memory": 4,
+        "ability_tags.logic": 4,
+        "learning_style_tags.exam_learning": 5,
+        "learning_style_tags.certificate_learning": 5,
+        "education_plan_tags.accept_master": 4
+      },
+      "market_scores": {
+        "policy_support_score": 4,
+        "job_volume_score": 3,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 2,
+        "stability_score": 4,
+        "competition_level": 5,
+        "city_concentration": 4,
+        "master_requirement": 4,
+        "ai_substitution_risk": 3
+      },
+      "suitable_profile_types": [
+        "稳定体制型",
+        "研究深造型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_law",
+        "exclusion_tags.no_heavy_memory",
+        "exclusion_tags.no_long_certificate"
+      ],
+      "related_career_paths": [
+        "律师",
+        "企业法务",
+        "合规专员",
+        "知识产权顾问",
+        "数据合规专员",
+        "公务员/司法系统岗位"
+      ],
+      "related_majors": [
+        "法学",
+        "知识产权",
+        "政治学与行政学",
+        "网络空间安全",
+        "信息安全",
+        "汉语言文学"
+      ],
+      "risk_notes": [
+        "法学本科就业分化明显",
+        "强依赖法考、实习和学校层次",
+        "优质法律岗位竞争激烈"
+      ],
+      "recommendation_note": "适合规则意识强、表达记忆好、愿意长期备考或走体制/法务路线的学生。"
+    },
+    {
+      "industry_id": "IND_DIGITAL_CONTENT_DESIGN",
+      "industry_name": "数字内容、传媒与设计创意",
+      "tier": "employment_friendly",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "数字经济",
+        "文化科技融合",
+        "内容产业",
+        "消费升级"
+      ],
+      "description": "覆盖数字媒体、网络新媒体、游戏动画、视觉设计、内容运营、品牌传播等方向，适合创意表达强、作品意识强的学生。",
+      "match_tags": {
+        "career_value_tags.creativity": 5,
+        "career_value_tags.freedom": 4,
+        "interest_tags.art_design": 5,
+        "interest_tags.text_expression": 4,
+        "interest_tags.business": 3,
+        "ability_tags.aesthetic": 5,
+        "ability_tags.language_expression": 4,
+        "learning_style_tags.project_learning": 4,
+        "work_scene_tags.creative_studio": 5,
+        "risk_tolerance_tags.uncertainty_tolerance": 4,
+        "risk_tolerance_tags.income_volatility_tolerance": 3
+      },
+      "market_scores": {
+        "policy_support_score": 4,
+        "job_volume_score": 4,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 4,
+        "stability_score": 2,
+        "competition_level": 4,
+        "city_concentration": 4,
+        "master_requirement": 2,
+        "ai_substitution_risk": 4
+      },
+      "suitable_profile_types": [
+        "内容创意型",
+        "商业经营型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_design",
+        "exclusion_tags.no_media",
+        "constraint_tags.avoid_unstable_employment",
+        "constraint_tags.avoid_ai_substitution_risk"
+      ],
+      "related_career_paths": [
+        "新媒体运营",
+        "内容策划",
+        "UI/UX设计师",
+        "视觉设计师",
+        "动画师",
+        "游戏美术",
+        "品牌策划",
+        "短视频编导"
+      ],
+      "related_majors": [
+        "数字媒体技术",
+        "网络与新媒体",
+        "广告学",
+        "动画",
+        "视觉传达设计",
+        "工业设计",
+        "广播电视编导"
+      ],
+      "risk_notes": [
+        "就业稳定性不如技术/体制路线",
+        "强依赖作品集、实习和城市机会",
+        "部分低端内容岗位AI替代风险上升"
+      ],
+      "recommendation_note": "适合表达、审美、创意强，并能接受行业波动和作品竞争的学生。"
+    },
+    {
+      "industry_id": "IND_MODERN_AGRI_FOOD_ENV",
+      "industry_name": "现代农业、食品安全与生态环境",
+      "tier": "policy_growth",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "农业农村现代化",
+        "农业新质生产力",
+        "食品安全",
+        "生态环保"
+      ],
+      "description": "覆盖智慧农业、食品科学、动物医学、环境治理、生态修复、农产品加工等方向，适合本地发展、公共服务或生命自然兴趣型学生。",
+      "match_tags": {
+        "career_value_tags.stability": 3,
+        "career_value_tags.local_development": 5,
+        "career_value_tags.social_value": 4,
+        "interest_tags.nature_environment": 5,
+        "interest_tags.life_health": 3,
+        "ability_tags.chemistry_biology": 4,
+        "ability_tags.hands_on": 4,
+        "work_scene_tags.outdoor": 4,
+        "work_scene_tags.lab": 3,
+        "risk_tolerance_tags.big_city_tolerance": 2
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 3,
+        "salary_potential_score": 3,
+        "undergrad_employment_score": 3,
+        "stability_score": 4,
+        "competition_level": 3,
+        "city_concentration": 2,
+        "master_requirement": 3,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "稳定体制型",
+        "研究深造型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_agriculture",
+        "exclusion_tags.no_research",
+        "exclusion_tags.no_basic_science"
+      ],
+      "related_career_paths": [
+        "食品研发/质检",
+        "动物医生",
+        "农业技术推广",
+        "环境工程师",
+        "生态修复工程师",
+        "农产品供应链管理"
+      ],
+      "related_majors": [
+        "食品科学与工程",
+        "动物医学",
+        "农学",
+        "园艺",
+        "环境工程",
+        "环境科学",
+        "农业智能装备工程"
+      ],
+      "risk_notes": [
+        "收入上限通常不如互联网金融",
+        "部分专业需要考研或考编提升就业质量",
+        "对地区产业基础依赖较强"
+      ],
+      "recommendation_note": "适合希望服务本地、关注食品生态、能接受实验或基层场景的学生。"
+    },
+    {
+      "industry_id": "IND_LOW_ALTITUDE_AEROSPACE",
+      "industry_name": "低空经济、航空航天与无人系统",
+      "tier": "policy_growth",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "航空航天",
+        "低空经济",
+        "无人系统",
+        "高端装备"
+      ],
+      "description": "覆盖无人机、低空交通、航空航天装备、飞行器设计、导航控制、空天信息等方向，政策热度高、技术壁垒强。",
+      "match_tags": {
+        "career_value_tags.technical_barrier": 5,
+        "career_value_tags.long_term_growth": 5,
+        "interest_tags.machine": 5,
+        "interest_tags.code_system": 3,
+        "ability_tags.physics": 5,
+        "ability_tags.math": 4,
+        "ability_tags.hands_on": 4,
+        "learning_style_tags.hard_learning_tolerance": 5,
+        "education_plan_tags.accept_master": 4,
+        "risk_tolerance_tags.competition_tolerance": 4
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 3,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 3,
+        "stability_score": 4,
+        "competition_level": 4,
+        "city_concentration": 4,
+        "master_requirement": 4,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "工程制造型",
+        "研究深造型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_engineering",
+        "exclusion_tags.no_long_training",
+        "constraint_tags.avoid_master_required"
+      ],
+      "related_career_paths": [
+        "飞行器设计工程师",
+        "无人机系统工程师",
+        "导航控制工程师",
+        "航空制造工程师",
+        "空天信息工程师"
+      ],
+      "related_majors": [
+        "飞行器设计与工程",
+        "飞行器制造工程",
+        "无人驾驶航空器系统工程",
+        "航空航天工程",
+        "自动化",
+        "测控技术与仪器"
+      ],
+      "risk_notes": [
+        "本科就业岗位相对集中",
+        "强依赖学校平台和地区产业基础",
+        "高端研发岗位偏好研究生"
+      ],
+      "recommendation_note": "适合理工能力强、对航空航天/无人系统有明确兴趣并能接受较高学习门槛的学生。"
+    },
+    {
+      "industry_id": "IND_TRANSPORT_LOGISTICS_SUPPLY_CHAIN",
+      "industry_name": "现代交通、物流与供应链",
+      "tier": "employment_friendly",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "现代服务业",
+        "交通强国",
+        "供应链韧性",
+        "产业融合"
+      ],
+      "description": "覆盖智慧物流、供应链管理、交通运输、仓储配送、跨境物流、工业供应链等方向，岗位覆盖面广，适合实践和组织协调型学生。",
+      "match_tags": {
+        "career_value_tags.undergrad_employment": 4,
+        "career_value_tags.local_development": 4,
+        "interest_tags.business": 4,
+        "interest_tags.people": 3,
+        "interest_tags.data": 3,
+        "ability_tags.organization": 4,
+        "ability_tags.communication": 3,
+        "ability_tags.logic": 3,
+        "learning_style_tags.practice_learning": 4,
+        "risk_tolerance_tags.travel_fieldwork_tolerance": 3
+      },
+      "market_scores": {
+        "policy_support_score": 4,
+        "job_volume_score": 5,
+        "salary_potential_score": 3,
+        "undergrad_employment_score": 4,
+        "stability_score": 3,
+        "competition_level": 3,
+        "city_concentration": 3,
+        "master_requirement": 2,
+        "ai_substitution_risk": 3
+      },
+      "suitable_profile_types": [
+        "商业经营型",
+        "稳定体制型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_sales",
+        "exclusion_tags.no_factory_site",
+        "constraint_tags.avoid_low_income_ceiling"
+      ],
+      "related_career_paths": [
+        "供应链专员",
+        "物流运营",
+        "采购专员",
+        "生产计划",
+        "跨境物流运营",
+        "交通运输管理"
+      ],
+      "related_majors": [
+        "物流管理",
+        "供应链管理",
+        "交通运输",
+        "交通工程",
+        "工业工程",
+        "电子商务"
+      ],
+      "risk_notes": [
+        "岗位层级差异大",
+        "基层岗位可能较辛苦",
+        "需要数据化和系统化能力提升上限"
+      ],
+      "recommendation_note": "适合希望本科就业、组织协调能力较强、愿意接触真实业务场景的学生。"
+    },
+    {
+      "industry_id": "IND_QUANTUM_6G_FUTURE_COMM",
+      "industry_name": "量子科技、6G与未来通信",
+      "tier": "future_frontier",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "未来产业",
+        "量子科技",
+        "第六代移动通信",
+        "前沿科技"
+      ],
+      "description": "覆盖量子信息、量子计算、量子通信、6G网络、未来通信协议与设备等方向，长期潜力高，但本科就业确定性较弱。",
+      "match_tags": {
+        "career_value_tags.technical_barrier": 5,
+        "career_value_tags.long_term_growth": 5,
+        "interest_tags.data": 4,
+        "interest_tags.code_system": 4,
+        "ability_tags.math": 5,
+        "ability_tags.physics": 5,
+        "ability_tags.logic": 5,
+        "learning_style_tags.research_learning": 5,
+        "education_plan_tags.accept_master": 5,
+        "education_plan_tags.accept_phd": 4,
+        "risk_tolerance_tags.uncertainty_tolerance": 4
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 2,
+        "salary_potential_score": 5,
+        "undergrad_employment_score": 1,
+        "stability_score": 3,
+        "competition_level": 5,
+        "city_concentration": 5,
+        "master_requirement": 5,
+        "ai_substitution_risk": 1
+      },
+      "suitable_profile_types": [
+        "研究深造型",
+        "高收入技术型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_long_training",
+        "exclusion_tags.no_research",
+        "constraint_tags.avoid_master_required"
+      ],
+      "related_career_paths": [
+        "量子算法研究员",
+        "通信算法工程师",
+        "无线通信工程师",
+        "科研助理",
+        "未来网络工程师"
+      ],
+      "related_majors": [
+        "物理学",
+        "应用物理学",
+        "电子信息工程",
+        "通信工程",
+        "信息工程",
+        "计算机科学与技术"
+      ],
+      "risk_notes": [
+        "本科直接就业确定性弱",
+        "强依赖研究生及以上学历",
+        "岗位集中在科研院所、大厂实验室和少数城市"
+      ],
+      "recommendation_note": "适合数学物理很强、愿意读研读博、追求前沿科技的学生。不适合作为普通本科就业优先学生的主推。"
+    },
+    {
+      "industry_id": "IND_BIO_MANUFACTURING_SYNTHETIC_BIO",
+      "industry_name": "生物制造与合成生物",
+      "tier": "future_frontier",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "未来产业",
+        "生物制造",
+        "生物经济",
+        "科技自立自强"
+      ],
+      "description": "覆盖合成生物、生物制造、生物材料、生物医药上游、发酵工程等方向，长期政策潜力高，但学历和科研门槛较高。",
+      "match_tags": {
+        "career_value_tags.technical_barrier": 5,
+        "career_value_tags.long_term_growth": 5,
+        "interest_tags.life_health": 5,
+        "interest_tags.nature_environment": 3,
+        "ability_tags.chemistry_biology": 5,
+        "ability_tags.memory": 4,
+        "learning_style_tags.research_learning": 5,
+        "education_plan_tags.accept_master": 5,
+        "education_plan_tags.accept_phd": 4,
+        "risk_tolerance_tags.uncertainty_tolerance": 4
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 2,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 2,
+        "stability_score": 3,
+        "competition_level": 4,
+        "city_concentration": 4,
+        "master_requirement": 5,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "研究深造型",
+        "医疗长期主义型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_research",
+        "exclusion_tags.no_long_training",
+        "constraint_tags.avoid_master_required"
+      ],
+      "related_career_paths": [
+        "生物研发工程师",
+        "发酵工程师",
+        "生物工艺工程师",
+        "医药研发助理",
+        "注册/质量管理"
+      ],
+      "related_majors": [
+        "生物工程",
+        "生物技术",
+        "生物科学",
+        "制药工程",
+        "药学",
+        "化学工程与工艺"
+      ],
+      "risk_notes": [
+        "本科就业质量差异较大",
+        "研发岗位通常偏好硕博",
+        "产业仍在成长中，地区差异明显"
+      ],
+      "recommendation_note": "适合生命科学兴趣强、愿意深造和科研的学生。不适合强烈本科就业优先的学生作为主推。"
+    },
+    {
+      "industry_id": "IND_HYDROGEN_NUCLEAR_ADVANCED_ENERGY",
+      "industry_name": "氢能、核能与先进能源",
+      "tier": "future_frontier",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "未来产业",
+        "氢能",
+        "核聚变能",
+        "能源安全",
+        "绿色化"
+      ],
+      "description": "覆盖氢能制储运、燃料电池、核能、核工程、先进能源材料等方向，政策潜力高、技术门槛高，部分方向就业面较窄。",
+      "match_tags": {
+        "career_value_tags.technical_barrier": 5,
+        "career_value_tags.long_term_growth": 5,
+        "interest_tags.machine": 4,
+        "interest_tags.nature_environment": 3,
+        "ability_tags.physics": 5,
+        "ability_tags.chemistry_biology": 3,
+        "ability_tags.math": 4,
+        "learning_style_tags.hard_learning_tolerance": 5,
+        "education_plan_tags.accept_master": 4,
+        "risk_tolerance_tags.uncertainty_tolerance": 3
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 2,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 2,
+        "stability_score": 4,
+        "competition_level": 3,
+        "city_concentration": 3,
+        "master_requirement": 4,
+        "ai_substitution_risk": 1
+      },
+      "suitable_profile_types": [
+        "工程制造型",
+        "研究深造型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_engineering",
+        "exclusion_tags.no_long_training",
+        "constraint_tags.avoid_unclear_path"
+      ],
+      "related_career_paths": [
+        "能源工程师",
+        "氢能系统工程师",
+        "燃料电池工程师",
+        "核工程技术岗",
+        "能源材料研发"
+      ],
+      "related_majors": [
+        "能源与动力工程",
+        "新能源科学与工程",
+        "核工程与核技术",
+        "材料科学与工程",
+        "化学工程与工艺"
+      ],
+      "risk_notes": [
+        "部分方向岗位数量有限",
+        "地域和单位集中度较高",
+        "高端研发岗位偏好研究生"
+      ],
+      "recommendation_note": "适合物理化学基础强、愿意进入能源硬科技领域的学生。"
+    },
+    {
+      "industry_id": "IND_EMBODIED_AI_BCI_ADVANCED_INTERACTION",
+      "industry_name": "具身智能、脑机接口与先进人机交互",
+      "tier": "future_frontier",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "未来产业",
+        "具身智能",
+        "脑机接口",
+        "人工智能",
+        "机器人"
+      ],
+      "description": "覆盖智能机器人、具身智能、脑机接口、人机交互、智能感知、医疗康复设备等方向，前沿性强、交叉学科属性明显。",
+      "match_tags": {
+        "career_value_tags.technical_barrier": 5,
+        "career_value_tags.long_term_growth": 5,
+        "interest_tags.code_system": 5,
+        "interest_tags.machine": 5,
+        "interest_tags.life_health": 3,
+        "ability_tags.math": 5,
+        "ability_tags.logic": 5,
+        "ability_tags.physics": 4,
+        "learning_style_tags.research_learning": 4,
+        "learning_style_tags.project_learning": 5,
+        "education_plan_tags.accept_master": 4,
+        "risk_tolerance_tags.uncertainty_tolerance": 4
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 2,
+        "salary_potential_score": 5,
+        "undergrad_employment_score": 2,
+        "stability_score": 3,
+        "competition_level": 5,
+        "city_concentration": 5,
+        "master_requirement": 5,
+        "ai_substitution_risk": 1
+      },
+      "suitable_profile_types": [
+        "高收入技术型",
+        "研究深造型",
+        "工程制造型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_programming",
+        "exclusion_tags.no_long_training",
+        "constraint_tags.avoid_master_required"
+      ],
+      "related_career_paths": [
+        "机器人算法工程师",
+        "具身智能工程师",
+        "机器视觉工程师",
+        "脑机接口研究助理",
+        "人机交互工程师"
+      ],
+      "related_majors": [
+        "人工智能",
+        "机器人工程",
+        "自动化",
+        "计算机科学与技术",
+        "生物医学工程",
+        "智能科学与技术"
+      ],
+      "risk_notes": [
+        "方向前沿但本科岗位少",
+        "强依赖研究生、项目和科研平台",
+        "岗位集中在少数企业/实验室"
+      ],
+      "recommendation_note": "适合高潜理工学生作为长期发展方向，不建议给普通本科就业优先学生作为唯一主推。"
+    },
+    {
+      "industry_id": "IND_SILVER_ECONOMY_ELDERCARE",
+      "industry_name": "银发经济、养老康养与适老服务",
+      "tier": "employment_friendly",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "银发经济",
+        "养老服务",
+        "健康中国",
+        "康养产业",
+        "民生服务",
+        "积极应对人口老龄化"
+      ],
+      "description": "覆盖养老服务、康复护理、老年健康管理、适老化改造、智慧养老、老年文旅、老年教育、养老金融与养老产业运营等方向。该方向兼具民生属性和产业成长性，适合稳定服务型、医疗健康型、公共服务型学生。",
+      "match_tags": {
+        "career_value_tags.stability": 5,
+        "career_value_tags.social_value": 5,
+        "career_value_tags.local_development": 5,
+        "career_value_tags.public_sector": 4,
+        "interest_tags.people": 5,
+        "interest_tags.life_health": 4,
+        "ability_tags.communication": 4,
+        "ability_tags.organization": 4,
+        "learning_style_tags.certificate_learning": 3,
+        "learning_style_tags.practice_learning": 4,
+        "education_plan_tags.accept_certificate": 3,
+        "risk_tolerance_tags.pressure_tolerance": 3,
+        "work_scene_tags.hospital": 3,
+        "work_scene_tags.government": 3,
+        "work_scene_tags.school": 2,
+        "work_scene_tags.office": 3
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 5,
+        "salary_potential_score": 3,
+        "undergrad_employment_score": 4,
+        "stability_score": 5,
+        "competition_level": 3,
+        "city_concentration": 2,
+        "master_requirement": 2,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "稳定体制型",
+        "医疗长期主义型",
+        "教育服务型",
+        "商业经营型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_medicine",
+        "exclusion_tags.no_hospital",
+        "exclusion_tags.no_sales",
+        "constraint_tags.avoid_low_income_ceiling"
+      ],
+      "related_career_paths": [
+        "养老机构运营管理",
+        "康复治疗师",
+        "护理师",
+        "老年健康管理师",
+        "适老化产品经理",
+        "智慧养老项目运营",
+        "老年教育/活动策划",
+        "养老社区运营",
+        "养老金融顾问",
+        "社会工作者"
+      ],
+      "related_majors": [
+        "护理学",
+        "康复治疗学",
+        "老年学",
+        "社会工作",
+        "公共事业管理",
+        "健康服务与管理",
+        "养老服务管理",
+        "应用心理学",
+        "食品营养与健康",
+        "智能医学工程"
+      ],
+      "risk_notes": [
+        "行业需求长期增长，但基层岗位收入上限可能一般",
+        "服务属性强，需要耐心、沟通和责任心",
+        "不同城市、机构和岗位的待遇差异较大",
+        "高质量岗位更看重运营能力、医疗康复知识或复合背景"
+      ],
+      "recommendation_note": "适合重视稳定、本地发展、社会价值，愿意与人打交道或进入健康服务方向的学生。若学生强烈追求高收入上限，需要提示该方向更偏稳定和长期需求，而不是短期高薪。"
+    },
+    {
+      "industry_id": "IND_PET_ECONOMY_ANIMAL_HEALTH",
+      "industry_name": "宠物经济、动物健康与陪伴消费",
+      "tier": "policy_growth",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "消费升级",
+        "情绪消费",
+        "动物健康",
+        "现代服务业",
+        "食品安全",
+        "城市生活服务"
+      ],
+      "description": "覆盖宠物医疗、宠物食品、宠物用品、宠物营养、宠物保险、宠物美容、宠物行为训练、宠物内容电商和动物健康管理等方向。该产业更偏消费服务与动物健康交叉，适合喜欢动物、生命健康、消费运营或本地服务的学生。",
+      "match_tags": {
+        "career_value_tags.freedom": 4,
+        "career_value_tags.local_development": 4,
+        "career_value_tags.undergrad_employment": 3,
+        "interest_tags.life_health": 5,
+        "interest_tags.nature_environment": 4,
+        "ability_tags.chemistry_biology": 4,
+        "ability_tags.communication": 4,
+        "ability_tags.hands_on": 4,
+        "learning_style_tags.practice_learning": 5,
+        "learning_style_tags.certificate_learning": 3,
+        "risk_tolerance_tags.income_volatility_tolerance": 3,
+        "risk_tolerance_tags.sales_tolerance": 3,
+        "risk_tolerance_tags.uncertainty_tolerance": 3,
+        "work_scene_tags.hospital": 3,
+        "work_scene_tags.office": 3,
+        "work_scene_tags.creative_studio": 2
+      },
+      "market_scores": {
+        "policy_support_score": 3,
+        "job_volume_score": 4,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 4,
+        "stability_score": 3,
+        "competition_level": 4,
+        "city_concentration": 3,
+        "master_requirement": 2,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "商业经营型",
+        "医疗长期主义型",
+        "内容创意型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_sales",
+        "exclusion_tags.no_medicine",
+        "exclusion_tags.no_hospital",
+        "constraint_tags.avoid_income_volatility",
+        "constraint_tags.avoid_unclear_path"
+      ],
+      "related_career_paths": [
+        "宠物医生",
+        "动物医院运营",
+        "宠物食品研发/品控",
+        "宠物营养顾问",
+        "宠物用品产品经理",
+        "宠物电商运营",
+        "宠物美容师",
+        "宠物行为训练师",
+        "宠物保险/服务产品运营",
+        "宠物内容运营"
+      ],
+      "related_majors": [
+        "动物医学",
+        "动物科学",
+        "食品科学与工程",
+        "食品质量与安全",
+        "生物技术",
+        "市场营销",
+        "电子商务",
+        "视觉传达设计",
+        "网络与新媒体",
+        "工商管理"
+      ],
+      "risk_notes": [
+        "行业消费属性强，岗位质量分化明显",
+        "宠物医疗较有技术壁垒，但需要专业资质和实践经验",
+        "宠物电商、内容、门店运营波动较大，较依赖城市消费水平",
+        "部分岗位销售和服务属性强，不适合排斥客户沟通的学生"
+      ],
+      "recommendation_note": "适合喜欢动物、生命健康或消费运营，并能接受服务业和一定商业不确定性的学生。若学生希望稳定编制或明确本科技术岗，需要谨慎作为主推。"
+    },
+    {
+      "industry_id": "IND_PUBLIC_SECTOR_EXAM_STABLE_EMPLOYMENT",
+      "industry_name": "考公考编、事业单位与国央企稳定就业",
+      "tier": "employment_friendly",
+      "industry_type": "employment_strategy",
+      "policy_alignment": [
+        "公共服务",
+        "基层治理",
+        "事业单位",
+        "国有企业",
+        "稳定就业",
+        "民生服务"
+      ],
+      "description": "覆盖公务员、事业单位、教师编、医疗卫生事业单位、国企央企、基层治理、公共管理等稳定就业路径。该方向不是传统产业赛道，而是面向稳定就业和公共部门岗位的职业路径集合。",
+      "match_tags": {
+        "career_value_tags.stability": 5,
+        "career_value_tags.public_sector": 5,
+        "career_value_tags.local_development": 5,
+        "career_value_tags.social_value": 4,
+        "career_value_tags.work_life_balance": 4,
+        "interest_tags.text_expression": 4,
+        "interest_tags.people": 4,
+        "interest_tags.law_rules": 4,
+        "ability_tags.language_expression": 5,
+        "ability_tags.memory": 4,
+        "ability_tags.communication": 4,
+        "ability_tags.logic": 3,
+        "learning_style_tags.exam_learning": 5,
+        "learning_style_tags.certificate_learning": 4,
+        "education_plan_tags.accept_public_exam": 5,
+        "risk_tolerance_tags.income_volatility_tolerance": 1,
+        "risk_tolerance_tags.competition_tolerance": 3,
+        "work_scene_tags.government": 5,
+        "work_scene_tags.school": 4,
+        "work_scene_tags.stable_institution": 5
+      },
+      "market_scores": {
+        "policy_support_score": 4,
+        "job_volume_score": 4,
+        "salary_potential_score": 3,
+        "undergrad_employment_score": 4,
+        "stability_score": 5,
+        "competition_level": 5,
+        "city_concentration": 2,
+        "master_requirement": 2,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "稳定体制型",
+        "教育服务型",
+        "医疗长期主义型",
+        "本地发展型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_public_exam",
+        "constraint_tags.avoid_high_competition"
+      ],
+      "related_career_paths": [
+        "公务员",
+        "事业单位职员",
+        "教师编",
+        "医疗卫生事业单位岗位",
+        "国企央企综合岗",
+        "国企技术岗",
+        "基层治理岗",
+        "公共管理岗",
+        "党政机关文字综合岗",
+        "财政税务岗",
+        "审计岗",
+        "市场监管岗"
+      ],
+      "related_majors": [
+        "汉语言文学",
+        "法学",
+        "会计学",
+        "审计学",
+        "财政学",
+        "税收学",
+        "行政管理",
+        "公共事业管理",
+        "思想政治教育",
+        "计算机科学与技术",
+        "软件工程",
+        "信息安全",
+        "统计学",
+        "数学与应用数学",
+        "临床医学",
+        "护理学",
+        "医学检验技术",
+        "电气工程及其自动化"
+      ],
+      "risk_notes": [
+        "稳定性强，但考试竞争激烈",
+        "岗位专业限制明显，不同地区招录专业差异大",
+        "收入上限通常低于互联网、金融、部分硬科技高薪岗位",
+        "部分岗位重视应试能力、文字能力、政策理解和长期备考",
+        "不能把所有专业都等同于适合考公，需结合岗位表校准"
+      ],
+      "recommendation_note": "适合稳定优先、愿意考试、希望本地发展或接受公共部门就业路径的学生。推荐时应同时提示考试竞争和专业岗位匹配度。"
+    },
+    {
+      "industry_id": "IND_SMART_EV_CONNECTED_VEHICLE",
+      "industry_name": "新能源汽车、智能网联汽车与汽车电子",
+      "tier": "policy_growth",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "智能网联新能源汽车",
+        "先进制造",
+        "绿色交通",
+        "汽车电子",
+        "智能驾驶",
+        "新型储能"
+      ],
+      "description": "覆盖新能源汽车整车、动力电池、电驱系统、智能座舱、自动驾驶、车联网、汽车电子和汽车软件等方向，是制造业升级和硬科技就业的重要交叉产业。",
+      "match_tags": {
+        "career_value_tags.technical_barrier": 5,
+        "career_value_tags.long_term_growth": 5,
+        "career_value_tags.high_income": 4,
+        "career_value_tags.undergrad_employment": 4,
+        "interest_tags.machine": 5,
+        "interest_tags.code_system": 4,
+        "interest_tags.data": 3,
+        "ability_tags.physics": 4,
+        "ability_tags.math": 4,
+        "ability_tags.logic": 4,
+        "ability_tags.hands_on": 4,
+        "learning_style_tags.project_learning": 4,
+        "risk_tolerance_tags.competition_tolerance": 4,
+        "work_scene_tags.factory_site": 3,
+        "work_scene_tags.tech_company": 4
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 5,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 4,
+        "stability_score": 4,
+        "competition_level": 4,
+        "city_concentration": 4,
+        "master_requirement": 3,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "工程制造型",
+        "高收入技术型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_engineering",
+        "exclusion_tags.no_manufacturing",
+        "exclusion_tags.no_factory_site",
+        "exclusion_tags.no_programming"
+      ],
+      "related_career_paths": [
+        "汽车电子工程师",
+        "嵌入式软件工程师",
+        "智能驾驶测试工程师",
+        "算法工程师",
+        "动力电池工程师",
+        "电驱系统工程师",
+        "整车测试工程师",
+        "车联网产品经理"
+      ],
+      "related_majors": [
+        "车辆工程",
+        "新能源汽车工程",
+        "智能车辆工程",
+        "电子信息工程",
+        "自动化",
+        "机械电子工程",
+        "电气工程及其自动化",
+        "计算机科学与技术",
+        "软件工程",
+        "交通运输"
+      ],
+      "risk_notes": [
+        "行业周期和企业竞争较强",
+        "岗位分布与城市、产业集群相关",
+        "智能驾驶和算法岗位对学校、项目和数学编程能力要求较高",
+        "部分岗位可能需要工厂、测试场或外勤场景"
+      ],
+      "recommendation_note": "适合理工能力强、喜欢汽车/机器/软件结合，并希望进入高成长制造业的学生。"
+    },
+    {
+      "industry_id": "IND_ADVANCED_MATERIALS_CHEMICALS",
+      "industry_name": "先进材料、化工新材料与高端制造基础",
+      "tier": "policy_growth",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "新材料",
+        "高端制造",
+        "新能源材料",
+        "半导体材料",
+        "生物医用材料",
+        "科技自立自强"
+      ],
+      "description": "覆盖新能源材料、半导体材料、高分子材料、复合材料、生物医用材料、精细化工和先进制造基础材料等方向，是集成电路、新能源、航空航天、生物医药等产业的底层支撑。",
+      "match_tags": {
+        "career_value_tags.technical_barrier": 4,
+        "career_value_tags.long_term_growth": 4,
+        "interest_tags.nature_environment": 3,
+        "interest_tags.machine": 3,
+        "interest_tags.life_health": 3,
+        "ability_tags.chemistry_biology": 5,
+        "ability_tags.physics": 4,
+        "ability_tags.math": 3,
+        "learning_style_tags.research_learning": 4,
+        "learning_style_tags.hard_learning_tolerance": 4,
+        "education_plan_tags.accept_master": 4,
+        "work_scene_tags.lab": 4,
+        "work_scene_tags.factory_site": 3
+      },
+      "market_scores": {
+        "policy_support_score": 5,
+        "job_volume_score": 3,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 3,
+        "stability_score": 4,
+        "competition_level": 3,
+        "city_concentration": 3,
+        "master_requirement": 4,
+        "ai_substitution_risk": 2
+      },
+      "suitable_profile_types": [
+        "研究深造型",
+        "工程制造型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_basic_science",
+        "exclusion_tags.no_research",
+        "exclusion_tags.no_factory_site",
+        "constraint_tags.avoid_master_required"
+      ],
+      "related_career_paths": [
+        "材料研发工程师",
+        "工艺工程师",
+        "质量工程师",
+        "新能源材料工程师",
+        "半导体材料工程师",
+        "高分子材料工程师",
+        "化工工艺工程师",
+        "实验室测试工程师"
+      ],
+      "related_majors": [
+        "材料科学与工程",
+        "高分子材料与工程",
+        "新能源材料与器件",
+        "无机非金属材料工程",
+        "复合材料与工程",
+        "化学工程与工艺",
+        "应用化学",
+        "材料化学",
+        "材料物理"
+      ],
+      "risk_notes": [
+        "本科直接高薪不确定，研发岗位常偏好研究生",
+        "部分岗位工作场景在实验室、工厂或化工园区",
+        "专业听起来基础，但就业质量高度依赖细分方向和学校平台",
+        "适合作为硬科技底层方向，不适合强烈排斥读研或实验的人"
+      ],
+      "recommendation_note": "适合化学物理基础较好、愿意深造或进入制造业研发/工艺岗位的学生。"
+    },
+    {
+      "industry_id": "IND_URBAN_RENEWAL_INFRA_DIGITAL",
+      "industry_name": "建筑、城市更新与基础设施数字化",
+      "tier": "policy_growth",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "城市更新",
+        "新型城镇化",
+        "韧性城市",
+        "基础设施数字化",
+        "绿色建筑",
+        "智慧城市"
+      ],
+      "description": "覆盖城市更新、建筑设计、土木工程、智慧城市、交通市政、绿色建筑、工程管理、BIM和基础设施运维等方向。该方向属于传统行业升级，岗位面广，但行业周期和地区差异明显。",
+      "match_tags": {
+        "career_value_tags.local_development": 4,
+        "career_value_tags.stability": 3,
+        "career_value_tags.undergrad_employment": 3,
+        "interest_tags.machine": 3,
+        "interest_tags.art_design": 3,
+        "interest_tags.data": 2,
+        "ability_tags.physics": 4,
+        "ability_tags.hands_on": 4,
+        "ability_tags.organization": 4,
+        "learning_style_tags.practice_learning": 4,
+        "work_scene_tags.factory_site": 3,
+        "work_scene_tags.office": 4,
+        "risk_tolerance_tags.travel_fieldwork_tolerance": 3
+      },
+      "market_scores": {
+        "policy_support_score": 4,
+        "job_volume_score": 4,
+        "salary_potential_score": 3,
+        "undergrad_employment_score": 3,
+        "stability_score": 3,
+        "competition_level": 3,
+        "city_concentration": 2,
+        "master_requirement": 2,
+        "ai_substitution_risk": 3
+      },
+      "suitable_profile_types": [
+        "工程制造型",
+        "稳定体制型",
+        "内容创意型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_engineering",
+        "exclusion_tags.no_factory_site",
+        "constraint_tags.avoid_unstable_employment"
+      ],
+      "related_career_paths": [
+        "土木工程师",
+        "结构工程师",
+        "建筑设计师",
+        "城乡规划师",
+        "工程管理",
+        "造价工程师",
+        "BIM工程师",
+        "智慧城市项目专员",
+        "市政工程师"
+      ],
+      "related_majors": [
+        "土木工程",
+        "建筑学",
+        "城乡规划",
+        "工程管理",
+        "工程造价",
+        "建筑环境与能源应用工程",
+        "给排水科学与工程",
+        "交通工程",
+        "测绘工程"
+      ],
+      "risk_notes": [
+        "受房地产下行周期影响，传统房建类岗位（住宅设计、房建施工、地产工程管理）近年明显收缩，不宜按过去的就业预期评估",
+        "城市更新、基础设施数字化、绿色建筑、市政与运维方向相对稳健，应优先推荐升级方向而非传统房建方向",
+        "就业体验地区差异大：基建投入持续的区域与收缩区域岗位量差距明显",
+        "部分岗位出差、工地、现场较多",
+        "建筑学、城乡规划等专业培养周期长、作品能力要求高，且行业缩量期转行成本较高"
+      ],
+      "recommendation_note": "适合希望本地发展、能接受工程现场工作的学生，但需明确告知：该方向处于传统行业收缩与升级并存阶段，推荐时应引导学生选择城市更新、基础设施数字化、绿色建筑等升级细分，而非传统房建路径。"
+    },
+    {
+      "industry_id": "IND_CROSS_BORDER_ECOMMERCE_CONSUMER_BRAND",
+      "industry_name": "跨境电商、品牌出海与现代消费服务",
+      "tier": "employment_friendly",
+      "industry_type": "industrial_sector",
+      "policy_alignment": [
+        "现代服务业",
+        "消费升级",
+        "跨境电商",
+        "品牌出海",
+        "数字贸易",
+        "外贸新业态"
+      ],
+      "description": "覆盖跨境电商运营、品牌出海、数字营销、直播电商、用户运营、供应链协同、国际贸易和消费品牌管理等方向。岗位多、进入门槛相对灵活，但波动和销售运营属性较强。",
+      "match_tags": {
+        "career_value_tags.high_income": 3,
+        "career_value_tags.freedom": 4,
+        "career_value_tags.undergrad_employment": 4,
+        "interest_tags.business": 5,
+        "interest_tags.people": 4,
+        "interest_tags.data": 3,
+        "ability_tags.communication": 4,
+        "ability_tags.english": 4,
+        "learning_style_tags.project_learning": 4,
+        "learning_style_tags.practice_learning": 5,
+        "risk_tolerance_tags.income_volatility_tolerance": 4,
+        "risk_tolerance_tags.uncertainty_tolerance": 4,
+        "risk_tolerance_tags.sales_tolerance": 4,
+        "work_scene_tags.office": 4,
+        "work_scene_tags.creative_studio": 3,
+        "work_scene_tags.remote_work": 3
+      },
+      "market_scores": {
+        "policy_support_score": 4,
+        "job_volume_score": 5,
+        "salary_potential_score": 4,
+        "undergrad_employment_score": 5,
+        "stability_score": 2,
+        "competition_level": 4,
+        "city_concentration": 4,
+        "master_requirement": 1,
+        "ai_substitution_risk": 4
+      },
+      "suitable_profile_types": [
+        "商业经营型",
+        "内容创意型"
+      ],
+      "not_recommended_if": [
+        "exclusion_tags.no_sales",
+        "constraint_tags.avoid_income_volatility",
+        "constraint_tags.avoid_unstable_employment",
+        "constraint_tags.avoid_ai_substitution_risk"
+      ],
+      "related_career_paths": [
+        "跨境电商运营",
+        "外贸业务员",
+        "品牌运营",
+        "数字营销",
+        "直播电商运营",
+        "用户运营",
+        "供应链运营",
+        "内容运营",
+        "国际贸易专员"
+      ],
+      "related_majors": [
+        "电子商务",
+        "国际经济与贸易",
+        "商务英语",
+        "市场营销",
+        "物流管理",
+        "供应链管理",
+        "网络与新媒体",
+        "广告学",
+        "数据科学与大数据技术"
+      ],
+      "risk_notes": [
+        "岗位多但质量分化明显",
+        "很多岗位销售、运营和业绩属性较强",
+        "平台规则和流量变化会影响职业稳定性",
+        "AI会替代部分低端内容和重复运营，需要强化数据、品牌和供应链能力"
+      ],
+      "recommendation_note": "适合商业兴趣强、英语或表达能力较好、能接受运营压力和收入波动的学生。"
+    }
+  ],
+  "usage_examples": {
+    "match_flow": [
+      "读取 student_profile_output.json",
+      "先根据 constraint_tags 做硬约束过滤或标记",
+      "计算每个产业的 match_tags 与学生画像标签相似度",
+      "结合 market_scores 做就业与政策修正",
+      "输出产业Top3，并保留推荐理由、风险说明和相关专业"
+    ],
+    "industry_score_formula_suggestion": "industry_score = career_value_match*0.30 + interest_match*0.25 + ability_match*0.20 + risk_tolerance_match*0.15 + education_plan_match*0.10，再根据 hard_filter_rules 进行排除或降权。"
+  }
+}

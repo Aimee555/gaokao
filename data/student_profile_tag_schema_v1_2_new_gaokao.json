@@ -1,0 +1,1201 @@
+{
+  "metadata": {
+    "project": "gaokao_major_recommendation_student_profile",
+    "file_name": "student_profile_tag_schema_v1_2_new_gaokao.json",
+    "version": "1.2.0",
+    "language": "zh-CN",
+    "created_at": "2026-06-07 08:01:40",
+    "description": "学生画像标签标准文件。用于把16题快速问卷/60题深度问卷的原始答案转换为结构化画像标签，作为后续产业方向、职业路径、专业推荐的统一输入。",
+    "gaokao_mode": "new_gaokao_3_subjects_only",
+    "related_questionnaires": [
+      "student_profile_quick_16",
+      "student_profile_deep_60"
+    ],
+    "core_principle": "问卷是采集层，画像标签是算法输入层，画像类型是用户理解层。",
+    "scale": {
+      "numeric_min": 0,
+      "numeric_max": 5,
+      "description": {
+        "0": "未知/未采集，不代表排斥",
+        "1": "很低/明显不适合/完全不接受",
+        "2": "偏低",
+        "3": "中等/可考虑",
+        "4": "较高",
+        "5": "很高/非常适合/非常接受"
+      }
+    }
+  },
+  "tag_groups": {
+    "constraint_tags": {
+      "type": "boolean",
+      "description": "硬性约束或推荐偏好约束。主要用于过滤、强降权或输出控制。",
+      "tags": {
+        "subject_physics": {
+          "label": "选科：物理",
+          "description": "学生新高考选科包含物理。用于专业选科要求硬过滤。",
+          "default": false
+        },
+        "subject_chemistry": {
+          "label": "选科：化学",
+          "description": "学生新高考选科包含化学。用于医学、药学、化学、生物等相关专业选科要求判断。",
+          "default": false
+        },
+        "subject_biology": {
+          "label": "选科：生物",
+          "description": "学生新高考选科包含生物。用于医学、生命科学、农学、食品等相关专业判断。",
+          "default": false
+        },
+        "subject_history": {
+          "label": "选科：历史",
+          "description": "学生新高考选科包含历史。",
+          "default": false
+        },
+        "subject_politics": {
+          "label": "选科：政治",
+          "description": "学生新高考选科包含政治。对法学、政治学、马克思主义理论、公安类等方向可能有帮助。",
+          "default": false
+        },
+        "subject_geography": {
+          "label": "选科：地理",
+          "description": "学生新高考选科包含地理。对地理科学、城乡规划、资源环境等方向可能有帮助。",
+          "default": false
+        },
+        "subject_technology": {
+          "label": "选科：技术/信息技术",
+          "description": "学生新高考选科包含技术/信息技术。不同省份适用情况需结合本省规则。",
+          "default": false
+        },
+        "city_flexible": {
+          "label": "城市灵活",
+          "description": "学生对未来城市发展地点没有明显限制。",
+          "default": false
+        },
+        "avoid_high_competition": {
+          "label": "规避高竞争",
+          "description": "推荐时应降低竞争强、淘汰率高、内卷明显的产业/专业权重。",
+          "default": false
+        },
+        "avoid_income_volatility": {
+          "label": "规避收入波动",
+          "description": "推荐时应降低销售、自由职业、强绩效制、创业型职业路径权重。",
+          "default": false
+        },
+        "avoid_big_city_concentration": {
+          "label": "规避大城市集中",
+          "description": "推荐时应降低岗位高度集中在一线/新一线城市的专业和职业路径权重。",
+          "default": false
+        },
+        "avoid_unstable_employment": {
+          "label": "规避就业不稳定",
+          "description": "推荐时应降低就业波动大、行业周期性强的方向权重。",
+          "default": false
+        },
+        "avoid_low_income_ceiling": {
+          "label": "规避收入上限低",
+          "description": "推荐时应优先考虑收入成长性较好的专业和职业路径。",
+          "default": false
+        },
+        "avoid_master_required": {
+          "label": "规避读研依赖",
+          "description": "推荐时应降低强依赖研究生学历的专业权重。",
+          "default": false
+        },
+        "avoid_family_resource_dependence": {
+          "label": "规避家庭资源依赖",
+          "description": "推荐时应降低强依赖家庭资源、人脉、城市资源的专业和职业路径权重。",
+          "default": false
+        },
+        "avoid_not_local_friendly": {
+          "label": "规避不适合本地发展",
+          "description": "推荐时应优先考虑本地岗位较多、区域适配度高的方向。",
+          "default": false
+        },
+        "avoid_unclear_path": {
+          "label": "规避路径模糊",
+          "description": "推荐时应降低就业路径泛化、岗位指向不清晰的专业权重。",
+          "default": false
+        },
+        "avoid_ai_substitution_risk": {
+          "label": "规避AI替代风险",
+          "description": "推荐时应降低重复性强、技能壁垒低、AI替代风险高的方向权重。",
+          "default": false
+        },
+        "output_salary_detail": {
+          "label": "输出薪资细节",
+          "description": "推荐报告需要额外说明薪资上限和收入风险。",
+          "default": false
+        },
+        "output_employment_detail": {
+          "label": "输出就业细节",
+          "description": "推荐报告需要额外说明岗位、城市、行业分布。",
+          "default": false
+        },
+        "output_learning_path": {
+          "label": "输出学习路径",
+          "description": "推荐报告需要额外说明大学四年学习路径。",
+          "default": false
+        },
+        "output_public_sector_fit": {
+          "label": "输出考公考编适配度",
+          "description": "推荐报告需要额外说明考公考编适配度。",
+          "default": false
+        },
+        "output_avoid_pitfall": {
+          "label": "输出避坑理由",
+          "description": "推荐报告需要额外说明不推荐和风险原因。",
+          "default": false
+        },
+        "output_parent_friendly": {
+          "label": "输出家长版解释",
+          "description": "推荐报告需要额外生成给家长看的解释。",
+          "default": false
+        }
+      }
+    },
+    "career_value_tags": {
+      "type": "number_0_5",
+      "description": "职业价值观标签。回答学生未来更看重什么。",
+      "tags": {
+        "high_income": {
+          "label": "高收入",
+          "description": "是否重视收入水平和收入上限。",
+          "default": 0
+        },
+        "stability": {
+          "label": "稳定",
+          "description": "是否重视岗位稳定、收入稳定和职业路径稳定。",
+          "default": 0
+        },
+        "work_life_balance": {
+          "label": "工作生活平衡",
+          "description": "是否重视轻松、少加班、生活平衡。",
+          "default": 0
+        },
+        "social_status": {
+          "label": "社会地位",
+          "description": "是否重视职业体面感、社会认可度。",
+          "default": 0
+        },
+        "freedom": {
+          "label": "自由度",
+          "description": "是否重视自由职业、远程办公、创业或工作自主性。",
+          "default": 0
+        },
+        "technical_barrier": {
+          "label": "技术壁垒",
+          "description": "是否重视专业技能门槛和不可替代性。",
+          "default": 0
+        },
+        "undergrad_employment": {
+          "label": "本科就业",
+          "description": "是否希望本科毕业后就有较清晰的就业路径。",
+          "default": 0
+        },
+        "public_sector": {
+          "label": "体制/编制/国企",
+          "description": "是否倾向考公、考编、事业单位、国企等稳定路径。",
+          "default": 0
+        },
+        "long_term_growth": {
+          "label": "长期发展上限",
+          "description": "是否重视长期成长空间和职业上限。",
+          "default": 0
+        },
+        "social_value": {
+          "label": "社会价值",
+          "description": "是否重视帮助别人、服务社会、职业意义感。",
+          "default": 0
+        },
+        "creativity": {
+          "label": "创造力",
+          "description": "是否希望发挥创意、设计、内容表达能力。",
+          "default": 0
+        },
+        "local_development": {
+          "label": "本地发展",
+          "description": "是否重视回家乡、本省、本地就业发展。",
+          "default": 0
+        },
+        "ai_resilience": {
+          "label": "抗AI替代",
+          "description": "是否重视职业不容易被AI替代。",
+          "default": 0
+        }
+      }
+    },
+    "interest_tags": {
+      "type": "number_0_5",
+      "description": "兴趣对象标签。回答学生更喜欢和什么对象打交道。",
+      "tags": {
+        "people": {
+          "label": "人",
+          "description": "沟通、协调、服务、帮助他人。",
+          "default": 0
+        },
+        "data": {
+          "label": "数据",
+          "description": "数据分析、建模、规律发现、图表分析。",
+          "default": 0
+        },
+        "machine": {
+          "label": "机器/设备",
+          "description": "机器、设备、工程系统、制造、控制。",
+          "default": 0
+        },
+        "code_system": {
+          "label": "代码/系统",
+          "description": "编程、软件、系统、工具开发。",
+          "default": 0
+        },
+        "business": {
+          "label": "商业",
+          "description": "赚钱、交易、运营、市场、品牌、管理。",
+          "default": 0
+        },
+        "text_expression": {
+          "label": "文字表达",
+          "description": "写作、语言、内容、传播、材料。",
+          "default": 0
+        },
+        "life_health": {
+          "label": "生命健康",
+          "description": "医学、心理、护理、生物、健康。",
+          "default": 0
+        },
+        "law_rules": {
+          "label": "法律规则",
+          "description": "法律、制度、规则、公平、辩论。",
+          "default": 0
+        },
+        "art_design": {
+          "label": "艺术设计",
+          "description": "审美、视觉、创意、设计、动画。",
+          "default": 0
+        },
+        "nature_environment": {
+          "label": "自然环境",
+          "description": "农业、生态、食品、环保、自然科学。",
+          "default": 0
+        },
+        "education_growth": {
+          "label": "教育成长",
+          "description": "教育、培养、儿童成长、知识传递。",
+          "default": 0
+        }
+      }
+    },
+    "ability_tags": {
+      "type": "number_0_5",
+      "description": "能力基础标签。回答学生更适合学什么、能不能学得动。",
+      "tags": {
+        "math": {
+          "label": "数学能力",
+          "description": "数学理解、计算、抽象能力。",
+          "default": 0
+        },
+        "logic": {
+          "label": "逻辑推理",
+          "description": "逻辑分析、结构化思考、推理能力。",
+          "default": 0
+        },
+        "physics": {
+          "label": "物理理解",
+          "description": "物理概念、工程原理、空间机械理解。",
+          "default": 0
+        },
+        "chemistry_biology": {
+          "label": "化学生物",
+          "description": "化学、生物的理解与记忆能力。",
+          "default": 0
+        },
+        "language_expression": {
+          "label": "语文写作表达",
+          "description": "阅读、写作、材料组织、语言表达。",
+          "default": 0
+        },
+        "english": {
+          "label": "英语能力",
+          "description": "英语阅读、听说、国际化学习能力。",
+          "default": 0
+        },
+        "memory": {
+          "label": "记忆背诵",
+          "description": "背诵、归纳、考试记忆能力。",
+          "default": 0
+        },
+        "communication": {
+          "label": "沟通表达",
+          "description": "口头表达、说服、协作、谈判能力。",
+          "default": 0
+        },
+        "hands_on": {
+          "label": "动手实践",
+          "description": "制作、实验、工程实践、实操能力。",
+          "default": 0
+        },
+        "aesthetic": {
+          "label": "审美能力",
+          "description": "视觉、设计、美感判断能力。",
+          "default": 0
+        },
+        "organization": {
+          "label": "组织协调",
+          "description": "组织活动、项目管理、团队协调能力。",
+          "default": 0
+        },
+        "programming_acceptance": {
+          "label": "编程接受度",
+          "description": "对编程、代码、计算机系统学习的接受度。",
+          "default": 0
+        },
+        "science_orientation": {
+          "label": "理科倾向",
+          "description": "学生自评理科明显更强。",
+          "default": 0
+        },
+        "liberal_arts_orientation": {
+          "label": "文科倾向",
+          "description": "学生自评文科明显更强。",
+          "default": 0
+        },
+        "balanced_orientation": {
+          "label": "文理均衡",
+          "description": "学生自评文理差不多。",
+          "default": 0
+        }
+      }
+    },
+    "risk_tolerance_tags": {
+      "type": "number_0_5",
+      "description": "风险承受标签。回答学生能接受什么代价。",
+      "tags": {
+        "competition_tolerance": {
+          "label": "竞争承受度",
+          "description": "能否接受行业竞争激烈、内卷、筛选强。",
+          "default": 0
+        },
+        "overtime_tolerance": {
+          "label": "加班承受度",
+          "description": "能否接受加班、高强度节奏。",
+          "default": 0
+        },
+        "income_volatility_tolerance": {
+          "label": "收入波动承受度",
+          "description": "能否接受收入不稳定或绩效波动。",
+          "default": 0
+        },
+        "pressure_tolerance": {
+          "label": "压力承受度",
+          "description": "能否承受学习、就业和工作压力。",
+          "default": 0
+        },
+        "uncertainty_tolerance": {
+          "label": "不确定性承受度",
+          "description": "能否接受职业路径不确定但发展空间大。",
+          "default": 0
+        },
+        "big_city_tolerance": {
+          "label": "大城市承受度",
+          "description": "能否接受岗位集中在一线/新一线/省会城市。",
+          "default": 0
+        },
+        "long_training_tolerance": {
+          "label": "长期培养承受度",
+          "description": "能否接受医学、科研、法学等较长培养周期。",
+          "default": 0
+        },
+        "sales_tolerance": {
+          "label": "销售客户压力承受度",
+          "description": "能否接受销售、客户沟通、绩效压力。",
+          "default": 0
+        },
+        "travel_fieldwork_tolerance": {
+          "label": "出差外勤承受度",
+          "description": "能否接受经常出差、外勤、现场工作。",
+          "default": 0
+        }
+      }
+    },
+    "learning_style_tags": {
+      "type": "number_0_5",
+      "description": "学习方式标签。回答学生适合什么学习和成长模式。",
+      "tags": {
+        "theory_learning": {
+          "label": "理论学习",
+          "description": "适合公式、原理、理论推导。",
+          "default": 0
+        },
+        "project_learning": {
+          "label": "项目学习",
+          "description": "适合做项目、做作品、实习实践。",
+          "default": 0
+        },
+        "exam_learning": {
+          "label": "考试学习",
+          "description": "适合刷题、考试、应试训练。",
+          "default": 0
+        },
+        "discussion_learning": {
+          "label": "讨论表达学习",
+          "description": "适合辩论、展示、讨论、表达型学习。",
+          "default": 0
+        },
+        "research_learning": {
+          "label": "科研学习",
+          "description": "适合实验、论文、研究、数据分析。",
+          "default": 0
+        },
+        "practice_learning": {
+          "label": "实操学习",
+          "description": "适合动手实践、技能训练、真实任务。",
+          "default": 0
+        },
+        "certificate_learning": {
+          "label": "考证学习",
+          "description": "是否愿意长期备考证书或资格考试。",
+          "default": 0
+        },
+        "continuous_learning": {
+          "label": "持续学习",
+          "description": "是否愿意长期学习新知识、新技术。",
+          "default": 0
+        },
+        "hard_learning_tolerance": {
+          "label": "高难学习承受度",
+          "description": "能否接受大学期间持续学习高难度内容。",
+          "default": 0
+        },
+        "data_modeling_acceptance": {
+          "label": "数据建模接受度",
+          "description": "对数学建模、统计分析、数据分析的接受程度。",
+          "default": 0
+        },
+        "flexible_learning": {
+          "label": "学习方式灵活",
+          "description": "对多种学习方式都可以接受。",
+          "default": 0
+        }
+      }
+    },
+    "education_plan_tags": {
+      "type": "number_0_5",
+      "description": "学历规划标签。回答学生是否愿意读研、读博、长期培养或本科就业。",
+      "tags": {
+        "prefer_undergrad_employment": {
+          "label": "偏好本科就业",
+          "description": "是否希望本科毕业后尽快就业。",
+          "default": 0
+        },
+        "accept_master": {
+          "label": "接受读研",
+          "description": "是否接受硕士阶段学习。",
+          "default": 0
+        },
+        "accept_phd": {
+          "label": "接受读博",
+          "description": "是否接受博士或长期科研。",
+          "default": 0
+        },
+        "accept_long_training": {
+          "label": "接受长期培养",
+          "description": "是否接受医学、科研、法学长期考试等培养周期。",
+          "default": 0
+        },
+        "accept_public_exam": {
+          "label": "接受考公考编",
+          "description": "是否接受公务员、事业单位、教师编等考试路径。",
+          "default": 0
+        },
+        "accept_certificate": {
+          "label": "接受长期考证",
+          "description": "是否接受CPA、法考、医师资格证、教师资格证等考证路径。",
+          "default": 0
+        }
+      }
+    },
+    "work_scene_tags": {
+      "type": "number_0_5",
+      "description": "工作场景标签。回答学生未来能接受什么工作环境。",
+      "tags": {
+        "office": {
+          "label": "办公室",
+          "description": "偏好办公室工作。",
+          "default": 0
+        },
+        "tech_company": {
+          "label": "科技公司",
+          "description": "偏好互联网、软件、AI、科技公司。",
+          "default": 0
+        },
+        "government": {
+          "label": "政府/事业单位",
+          "description": "偏好政府机关、事业单位。",
+          "default": 0
+        },
+        "school": {
+          "label": "学校/教育机构",
+          "description": "偏好学校、培训、教育机构。",
+          "default": 0
+        },
+        "hospital": {
+          "label": "医院/诊所",
+          "description": "偏好医院、诊所、医疗健康场景。",
+          "default": 0
+        },
+        "financial_institution": {
+          "label": "金融机构",
+          "description": "偏好银行、证券、保险、基金、金融科技等机构。",
+          "default": 0
+        },
+        "factory_site": {
+          "label": "工厂/工程现场",
+          "description": "偏好或能接受工厂、工程现场、制造业场景。",
+          "default": 0
+        },
+        "lab": {
+          "label": "实验室",
+          "description": "偏好实验室、科研环境。",
+          "default": 0
+        },
+        "outdoor": {
+          "label": "户外/自然环境",
+          "description": "偏好户外、自然、农业、生态环境。",
+          "default": 0
+        },
+        "creative_studio": {
+          "label": "设计/传媒工作室",
+          "description": "偏好设计、传媒、内容、创意工作室。",
+          "default": 0
+        },
+        "remote_work": {
+          "label": "远程办公",
+          "description": "偏好远程办公、自由职业。",
+          "default": 0
+        },
+        "big_city": {
+          "label": "大城市场景",
+          "description": "偏好或接受一线、新一线、强二线发展。",
+          "default": 0
+        },
+        "provincial_city": {
+          "label": "省会城市场景",
+          "description": "偏好或接受省会城市发展。",
+          "default": 0
+        },
+        "stable_institution": {
+          "label": "稳定机构场景",
+          "description": "偏好医院、学校、机关等稳定组织。",
+          "default": 0
+        }
+      }
+    },
+    "exclusion_tags": {
+      "type": "boolean",
+      "description": "排除标签。命中后用于直接排除或强降权。默认false。",
+      "tags": {
+        "no_medicine": {
+          "label": "排斥医学",
+          "description": "不推荐医学、护理、医院相关方向作为主推。",
+          "default": false
+        },
+        "no_programming": {
+          "label": "排斥编程",
+          "description": "不推荐强编程相关方向作为主推，如软件、计算机、AI、数据科学等。",
+          "default": false
+        },
+        "avoid_programming": {
+          "label": "不太喜欢编程",
+          "description": "对强编程专业降权，但不一定直接排除。",
+          "default": false
+        },
+        "no_teaching": {
+          "label": "排斥教师/师范",
+          "description": "不推荐师范、教师、教育类方向作为主推。",
+          "default": false
+        },
+        "no_sales": {
+          "label": "排斥销售",
+          "description": "不推荐强销售、客户开发、业绩制路径。",
+          "default": false
+        },
+        "no_factory_site": {
+          "label": "排斥工厂/现场",
+          "description": "不推荐强工厂、现场、工程运维场景作为主推。",
+          "default": false
+        },
+        "no_factory": {
+          "label": "排斥工厂",
+          "description": "不推荐工厂场景较强的方向。",
+          "default": false
+        },
+        "no_civil_service": {
+          "label": "排斥体制路线",
+          "description": "不把考公考编作为主推路径。",
+          "default": false
+        },
+        "no_public_exam": {
+          "label": "排斥考公考编",
+          "description": "不推荐以公考、事业编为核心路径。",
+          "default": false
+        },
+        "no_law": {
+          "label": "排斥法学",
+          "description": "不推荐法学、法律合规方向作为主推。",
+          "default": false
+        },
+        "no_finance": {
+          "label": "排斥财经金融",
+          "description": "不推荐财经、金融、会计、审计等作为主推。",
+          "default": false
+        },
+        "no_design": {
+          "label": "排斥设计艺术",
+          "description": "不推荐设计、艺术、视觉、动画等作为主推。",
+          "default": false
+        },
+        "no_engineering": {
+          "label": "排斥工科",
+          "description": "不推荐大多数工程技术类专业作为主推。",
+          "default": false
+        },
+        "no_manufacturing": {
+          "label": "排斥制造",
+          "description": "不推荐机械、智能制造、制造业相关专业作为主推。",
+          "default": false
+        },
+        "no_electronics": {
+          "label": "排斥电子信息",
+          "description": "不推荐电子信息、通信、集成电路相关方向作为主推。",
+          "default": false
+        },
+        "no_agriculture": {
+          "label": "排斥农学",
+          "description": "不推荐农学、园艺、动物科学、农业工程等作为主推。",
+          "default": false
+        },
+        "no_media": {
+          "label": "排斥传媒内容",
+          "description": "不推荐传媒、新闻、内容、影视等方向作为主推。",
+          "default": false
+        },
+        "no_management": {
+          "label": "排斥管理类",
+          "description": "不推荐工商管理、公共管理等泛管理方向作为主推。",
+          "default": false
+        },
+        "no_foreign_language": {
+          "label": "排斥外语类",
+          "description": "不推荐外语类专业作为主推。",
+          "default": false
+        },
+        "no_basic_science": {
+          "label": "排斥基础学科",
+          "description": "不推荐数学、物理、化学、生物等基础学科作为主推。",
+          "default": false
+        },
+        "no_long_training": {
+          "label": "排斥长期培养",
+          "description": "不推荐强依赖长期培养、读研读博或长周期考试的路径。",
+          "default": false
+        },
+        "no_high_overtime": {
+          "label": "排斥高强度加班",
+          "description": "对互联网、投行、咨询、部分医疗等高强度岗位降权。",
+          "default": false
+        },
+        "no_long_certificate": {
+          "label": "排斥长期考证",
+          "description": "不推荐强依赖长期考证的职业路径。",
+          "default": false
+        },
+        "no_heavy_memory": {
+          "label": "排斥大量背诵",
+          "description": "对法学、医学、部分文科、考编路径降权。",
+          "default": false
+        },
+        "no_research": {
+          "label": "排斥科研实验",
+          "description": "不推荐强科研、实验、论文路径作为主推。",
+          "default": false
+        },
+        "no_hospital": {
+          "label": "排斥医院环境",
+          "description": "不推荐医院场景相关职业路径。",
+          "default": false
+        },
+        "no_school": {
+          "label": "排斥学校环境",
+          "description": "不推荐学校、教师、教育机构场景。",
+          "default": false
+        }
+      }
+    }
+  },
+  "aggregation_rules": {
+    "initialization": {
+      "numeric_tags_default": 0,
+      "boolean_tags_default": false,
+      "raw_answers": [],
+      "custom_answers": []
+    },
+    "numeric_tag_merge_strategy": {
+      "default": "max",
+      "description": "同一个数值标签被多题命中时，默认取最大值，避免多选题简单累加导致分值溢出。也可以在后端配置为加权平均。",
+      "allowed_values": [
+        "max",
+        "weighted_average",
+        "last_write_wins"
+      ]
+    },
+    "boolean_tag_merge_strategy": {
+      "default": "or",
+      "description": "排除项和约束项只要任一题命中即为true。"
+    },
+    "ranking_multi_select": {
+      "rank_scores": {
+        "1": 5,
+        "2": 4,
+        "3": 3
+      },
+      "description": "排序题按名次写入对应标签。第1优先级=5，第2=4，第3=3。"
+    },
+    "multi_select": {
+      "unordered_score": 4,
+      "description": "普通多选题若不要求排序，选中即按选项tag_effects写入。选项中已给出具体分值时优先使用选项分值。"
+    },
+    "scale_1_5": {
+      "description": "1-5分量表直接写入target_tag。"
+    },
+    "single_choice": {
+      "description": "单选题按选项tag_effects写入。"
+    },
+    "custom_text": {
+      "storage": "raw_custom_answers",
+      "description": "其他/自由填写内容先保存到raw_custom_answers，不直接覆盖硬性排除项。可用AI或人工规则二次归类。"
+    },
+    "exclusive_options": {
+      "option_codes": [
+        "none",
+        "any",
+        "not_focus",
+        "uncertain"
+      ],
+      "description": "如选择“都可以/暂时没有/不确定”等，应与同题其他实质选项互斥，具体以问卷题目配置为准。"
+    }
+  },
+  "questionnaire_mapping_notes": {
+    "quick_16": {
+      "description": "16题快速版用于快速生成初步画像。",
+      "must_have_outputs": [
+        "subject constraints",
+        "career_value_tags",
+        "interest_tags",
+        "ability_tags",
+        "risk_tolerance_tags",
+        "education_plan_tags",
+        "exclusion_tags",
+        "constraint_tags"
+      ],
+      "recommended_adjustments": [
+        {
+          "question_id": "Q10",
+          "adjustment": "除 interest_tags.code_system 外，建议同步写入 ability_tags.programming_acceptance。"
+        },
+        {
+          "question_id": "Q13",
+          "adjustment": "快速版可以合并加班和竞争；深度版建议拆成 competition_tolerance 与 overtime_tolerance。"
+        },
+        {
+          "question_id": "Q01",
+          "adjustment": "固定新高考3选科，必须选择3科；选科只进入 constraint_tags，不进入兴趣或能力评分。"
+        }
+      ]
+    },
+    "deep_60": {
+      "description": "60题深度版用于精细画像、冲突识别和更强解释。",
+      "must_have_outputs": [
+        "all quick_16 outputs",
+        "learning_style_tags",
+        "work_scene_tags",
+        "more detailed exclusion_tags",
+        "custom constraints"
+      ]
+    }
+  },
+  "profile_output_template": {
+    "student_id": "string",
+    "profile_version": "v1.2.0",
+    "primary_profile_type": "string",
+    "secondary_profile_types": [],
+    "profile_summary": "string",
+    "career_value_tags": {},
+    "interest_tags": {},
+    "ability_tags": {},
+    "risk_tolerance_tags": {},
+    "learning_style_tags": {},
+    "education_plan_tags": {},
+    "work_scene_tags": {},
+    "exclusion_tags": {},
+    "constraint_tags": {},
+    "raw_answers": [],
+    "raw_custom_answers": []
+  },
+  "profile_type_rules": [
+    {
+      "type_code": "high_income_tech",
+      "type_name": "高收入技术型",
+      "priority": 90,
+      "conditions": [
+        {
+          "path": "career_value_tags.high_income",
+          "operator": ">=",
+          "value": 4
+        },
+        {
+          "path": "career_value_tags.technical_barrier",
+          "operator": ">=",
+          "value": 4
+        },
+        {
+          "path": "ability_tags.logic",
+          "operator": ">=",
+          "value": 4
+        },
+        {
+          "path": "ability_tags.programming_acceptance",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "path": "risk_tolerance_tags.competition_tolerance",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "path": "exclusion_tags.no_programming",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "summary_template": "你重视收入上限和技术壁垒，逻辑能力较好，对编程和技术学习有一定接受度，适合优先考虑技能壁垒较强、岗位路径清晰的技术方向。"
+    },
+    {
+      "type_code": "stable_public_sector",
+      "type_name": "稳定体制型",
+      "priority": 85,
+      "conditions": [
+        {
+          "path": "career_value_tags.stability",
+          "operator": ">=",
+          "value": 4
+        },
+        {
+          "path": "career_value_tags.public_sector",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "path": "exclusion_tags.no_public_exam",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "summary_template": "你更重视稳定和确定性，对体制内、国企、事业单位或考编路径有一定接受度，适合优先考虑稳定就业和公共部门适配度较高的方向。"
+    },
+    {
+      "type_code": "medical_long_term",
+      "type_name": "医疗长期主义型",
+      "priority": 80,
+      "conditions": [
+        {
+          "path": "interest_tags.life_health",
+          "operator": ">=",
+          "value": 4
+        },
+        {
+          "path": "education_plan_tags.accept_long_training",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "path": "exclusion_tags.no_medicine",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "path": "constraint_tags.subject_chemistry",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "summary_template": "你对生命健康方向兴趣较高，并能接受较长培养周期。若选科满足要求，可以重点考虑医学、药学、护理、康复等医疗健康方向。"
+    },
+    {
+      "type_code": "business_operation",
+      "type_name": "商业经营型",
+      "priority": 75,
+      "conditions": [
+        {
+          "path": "interest_tags.business",
+          "operator": ">=",
+          "value": 4
+        },
+        {
+          "path": "ability_tags.communication",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "path": "risk_tolerance_tags.income_volatility_tolerance",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "path": "exclusion_tags.no_sales",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "summary_template": "你对商业、交易、运营或管理有明显兴趣，且能接受一定不确定性，适合考虑商业经营、金融数据、运营管理等方向，但需要关注学校层次、城市资源和实习经历。"
+    },
+    {
+      "type_code": "creative_content",
+      "type_name": "内容创意型",
+      "priority": 70,
+      "conditions": [
+        {
+          "any_of": [
+            {
+              "path": "interest_tags.art_design",
+              "operator": ">=",
+              "value": 4
+            },
+            {
+              "path": "interest_tags.text_expression",
+              "operator": ">=",
+              "value": 4
+            },
+            {
+              "path": "career_value_tags.creativity",
+              "operator": ">=",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "path": "exclusion_tags.no_design",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "path": "exclusion_tags.no_media",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "summary_template": "你对内容、表达、设计或创意有较强兴趣，适合考虑数字媒体、网络与新媒体、设计、动画、内容传播等方向，但要注意就业稳定性和作品能力要求。"
+    },
+    {
+      "type_code": "engineering_manufacturing",
+      "type_name": "工程制造型",
+      "priority": 70,
+      "conditions": [
+        {
+          "path": "interest_tags.machine",
+          "operator": ">=",
+          "value": 4
+        },
+        {
+          "path": "ability_tags.physics",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "path": "exclusion_tags.no_factory_site",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "path": "exclusion_tags.no_engineering",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "path": "constraint_tags.subject_physics",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "summary_template": "你对机器、设备、工程系统有较高兴趣，且选科和能力基础较适合工科方向，可以考虑自动化、电气、机械电子、智能制造、机器人等工程技术路径。"
+    },
+    {
+      "type_code": "education_service",
+      "type_name": "教育服务型",
+      "priority": 65,
+      "conditions": [
+        {
+          "any_of": [
+            {
+              "path": "interest_tags.education_growth",
+              "operator": ">=",
+              "value": 4
+            },
+            {
+              "path": "work_scene_tags.school",
+              "operator": ">=",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "path": "career_value_tags.stability",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "path": "exclusion_tags.no_teaching",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "summary_template": "你对教育、帮助他人成长或学校环境有一定接受度，同时重视稳定，可以考虑师范、教育学、心理学或培训相关方向。"
+    },
+    {
+      "type_code": "research_deep_study",
+      "type_name": "研究深造型",
+      "priority": 65,
+      "conditions": [
+        {
+          "path": "learning_style_tags.research_learning",
+          "operator": ">=",
+          "value": 4
+        },
+        {
+          "path": "education_plan_tags.accept_master",
+          "operator": ">=",
+          "value": 4
+        },
+        {
+          "path": "education_plan_tags.accept_phd",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "path": "exclusion_tags.no_research",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "summary_template": "你对科研、实验、论文或深度学习有较高接受度，并能接受继续深造，适合考虑基础学科、科研导向或高学历壁垒方向。"
+    }
+  ],
+  "hard_filter_rules_for_recommendation": [
+    {
+      "rule_code": "subject_requirement_filter",
+      "description": "专业选科要求不满足时，不进入主推荐。可在结果中标记为不可报考或选科不符。",
+      "input_tags": [
+        "constraint_tags.subject_physics",
+        "constraint_tags.subject_chemistry",
+        "constraint_tags.subject_biology",
+        "constraint_tags.subject_history",
+        "constraint_tags.subject_politics",
+        "constraint_tags.subject_geography",
+        "constraint_tags.subject_technology"
+      ]
+    },
+    {
+      "rule_code": "medicine_exclusion",
+      "condition": "exclusion_tags.no_medicine == true",
+      "action": "exclude_or_strong_penalty",
+      "targets": [
+        "医学类",
+        "护理类",
+        "医院场景强相关职业"
+      ]
+    },
+    {
+      "rule_code": "programming_exclusion",
+      "condition": "exclusion_tags.no_programming == true",
+      "action": "strong_penalty",
+      "targets": [
+        "计算机科学与技术",
+        "软件工程",
+        "人工智能",
+        "数据科学与大数据技术",
+        "信息安全"
+      ]
+    },
+    {
+      "rule_code": "long_training_exclusion",
+      "condition": "exclusion_tags.no_long_training == true",
+      "action": "strong_penalty",
+      "targets": [
+        "临床医学",
+        "基础医学",
+        "科研导向基础学科",
+        "强读研依赖专业"
+      ]
+    },
+    {
+      "rule_code": "local_development_constraint",
+      "condition": "career_value_tags.local_development >= 4 or constraint_tags.avoid_big_city_concentration == true",
+      "action": "penalty_big_city_concentrated_paths",
+      "targets": [
+        "互联网高薪岗位",
+        "投行咨询",
+        "高端传媒",
+        "部分AI算法岗位"
+      ]
+    }
+  ],
+  "example_profile_output": {
+    "student_id": "SAMPLE_001",
+    "profile_version": "v1.2.0",
+    "primary_profile_type": "高收入技术型",
+    "secondary_profile_types": [
+      "工程制造型"
+    ],
+    "profile_summary": "该学生重视收入上限和技术壁垒，数学与逻辑能力较好，不排斥编程，能接受一定竞争和阶段性加班，适合优先考虑技术壁垒较强、本科就业路径较清晰的方向。",
+    "career_value_tags": {
+      "high_income": 5,
+      "technical_barrier": 4,
+      "undergrad_employment": 3,
+      "stability": 2
+    },
+    "interest_tags": {
+      "data": 5,
+      "code_system": 4,
+      "machine": 3,
+      "business": 3
+    },
+    "ability_tags": {
+      "math": 4,
+      "logic": 5,
+      "language_expression": 3,
+      "memory": 2,
+      "programming_acceptance": 4
+    },
+    "risk_tolerance_tags": {
+      "competition_tolerance": 4,
+      "overtime_tolerance": 3,
+      "big_city_tolerance": 5
+    },
+    "education_plan_tags": {
+      "accept_master": 3,
+      "prefer_undergrad_employment": 5
+    },
+    "exclusion_tags": {
+      "no_medicine": true,
+      "no_sales": true,
+      "no_programming": false
+    },
+    "constraint_tags": {
+      "subject_physics": true,
+      "subject_chemistry": true,
+      "subject_biology": false,
+      "subject_history": false,
+      "subject_politics": false,
+      "subject_geography": true
+    }
+  }
+}

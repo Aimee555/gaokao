@@ -1,0 +1,565 @@
+{
+  "metadata": {
+    "project": "gaokao_major_recommendation",
+    "file_name": "industry_matching_rules_v1_2.json",
+    "version": "1.2.0",
+    "language": "zh-CN",
+    "created_at": "2026-06-07 09:19:26",
+    "description": "产业匹配规则文件。用于将学生画像标签与产业方向库进行匹配，输出产业推荐Top N。",
+    "input_files": [
+      "student_profile_output.json",
+      "industry_library_v1_3.json"
+    ],
+    "output_file": "industry_recommendation_result.json",
+    "core_goal": "把学生画像标签转换为可解释的产业方向推荐结果。",
+    "design_principle": [
+      "规则负责排序和排除，AI负责解释和润色。",
+      "优先保证推荐结果可控、可复现、可调参。",
+      "十五五政策方向只作为修正项，不能压过学生画像匹配。",
+      "就业友好度要考虑岗位量、本科就业、稳定性、城市集中度、学历要求和竞争强度。"
+    ],
+    "updated_at": "2026-06-08",
+    "update_note_v1_2": "v1.2修复（与industryMatcher实现对齐）：A) supporting bonus不再用0.55默认值给未作答辅助标签加分（消除全产业profile_match虚高+4~6）；B) 新增非硬惩罚全局上限max_non_hard_penalty=40，阻止跨根因soft/strong堆叠把谨慎学生整片打进D；C) low_confidence挤出Top3不再仅限deep，quick模式同样生效（靠graceful fill兜底不清空结果）；D) income_volatility自适应惩罚兼容avoid_income_volatility与avoid_unstable_employment任一命中；E) 明确matched_reasons下限兜底(0.5不足则放宽0.35)与risk_notes裁剪到5条、预警优先；F) insufficient_data在Top3全low_confidence时也触发；G) 选科类条件(subject_xxx==false)移出产业层hard_exclusion，仅作预警，硬过滤交专业库阶段；H) 产业库补齐全部industry_type、删除死条件no_civil_service；I) 新增known_limitations登记coverage口径/万金油coverage/career_value默认2.5/interest结构限制/70-30权重等设计权衡。",
+    "update_note": "v1.1修复：1) 新增penalty_deduplication，同一根因的惩罚只取最大值，避免重复扣分；2) 自适应惩罚从market_fit_score移到final_score层，与not_recommended惩罚统一量纲；3) 标签匹配公式按标签组区分单边/对称：能力、风险承受、学历计划为门槛型单边，职业价值为供给型单边，兴趣保留对称距离；4) 缺失值不再触发hard_exclusion，仅产生预警；5) 补充market基础分1-5到0-100的显式换算公式；6) tie_breakers第4条去掉条件改为无条件兜底。；7) 新增frontier延伸推荐位与标签覆盖度置信规则，并修订高潜科研型测试期望（frontier走延伸位而非Top3）。；8) career_value匹配改为需求加权并集遍历（修复高供给产业通吃问题）。；9) penalty_deduplication.income_volatility根因组补回constraint_tags.avoid_income_volatility——产业库中avoid_income_volatility与avoid_unstable_employment混用（如跨境电商两者并存），旧版只归入avoid_unstable_employment会导致同根因soft_penalty重复累加18+18。"
+  },
+  "input_schema": {
+    "student_profile": {
+      "required_groups": [
+        "career_value_tags",
+        "interest_tags",
+        "ability_tags",
+        "risk_tolerance_tags",
+        "education_plan_tags",
+        "exclusion_tags",
+        "constraint_tags"
+      ],
+      "optional_groups": [
+        "learning_style_tags",
+        "work_scene_tags"
+      ],
+      "numeric_tag_scale": {
+        "min": 0,
+        "max": 5,
+        "note": "0表示未知，不代表排斥；1表示很低；5表示很高。"
+      },
+      "boolean_tag_rule": {
+        "true": "命中排除或约束",
+        "false": "未命中"
+      }
+    },
+    "industry_library": {
+      "required_fields_per_industry": [
+        "industry_id",
+        "industry_name",
+        "tier",
+        "match_tags",
+        "market_scores",
+        "not_recommended_if",
+        "related_career_paths",
+        "related_majors",
+        "risk_notes",
+        "recommendation_note"
+      ]
+    }
+  },
+  "score_formula": {
+    "final_score": {
+      "formula": "final_score = profile_match_score * 0.70 + market_fit_score * 0.30 - total_penalty",
+      "min_score": 0,
+      "max_score": 100,
+      "rounding": "round_to_integer",
+      "total_penalty_rule": "total_penalty = hard_penalty + min(max_non_hard_penalty, sum(去重后的非硬惩罚))。硬排除(60)全额累加并使产业进入not_recommended；其余market_adaptive与strong/soft惩罚去重后封顶max_non_hard_penalty。所有惩罚统一作用于final_score的0-100量纲，不再在market_fit_score内部扣减。",
+      "max_non_hard_penalty": 40,
+      "max_non_hard_penalty_reason": "跨根因的soft/strong惩罚原本线性累加，勾选多项avoid的谨慎学生会被堆叠到50+、整片打进D档（越诚实填顾虑结果越差）。封顶40后单一硬排除仍可主导，但多个软约束不再无限叠加。"
+    },
+    "profile_match_score": {
+      "formula": "career_value_match*0.30 + interest_match*0.25 + ability_match*0.20 + risk_tolerance_match*0.15 + education_plan_match*0.10",
+      "scale": "0-100",
+      "dimension_weights": {
+        "career_value_match": 0.3,
+        "interest_match": 0.25,
+        "ability_match": 0.2,
+        "risk_tolerance_match": 0.15,
+        "education_plan_match": 0.1
+      }
+    },
+    "market_fit_score": {
+      "formula": "market_fit_score = (weighted_market_avg - 1) / 4 * 100，其中 weighted_market_avg = Σ(market_scores[k] * base_weights[k])，k遍历base_weights各项",
+      "scale": "0-100",
+      "base_weights": {
+        "job_volume_score": 0.25,
+        "undergrad_employment_score": 0.2,
+        "salary_potential_score": 0.2,
+        "stability_score": 0.15,
+        "policy_support_score": 0.1,
+        "ai_resilience_score": 0.1
+      },
+      "ai_resilience_score_rule": {
+        "source": "market_scores.ai_substitution_risk",
+        "formula": "ai_resilience_score = 6 - ai_substitution_risk",
+        "note": "产业库里ai_substitution_risk越高表示替代风险越高，因此转换为抗替代分。"
+      },
+      "scale_conversion_note": "产业库market_scores为1-5分制，加权平均后仍在1-5区间，须用(x-1)/4*100线性映射到0-100。ai_resilience_score先按 6 - ai_substitution_risk 转换后再参与加权。"
+    }
+  },
+  "tag_match_rules": {
+    "single_numeric_tag_match": {
+      "description": "按标签组选择匹配公式。industry_value为产业match_tags中的值，student_value为学生画像值。",
+      "formula_by_group": {
+        "threshold_type": {
+          "applies_to": [
+            "ability_tags.*",
+            "risk_tolerance_tags.*",
+            "education_plan_tags.*"
+          ],
+          "formula": "match = 1 if student_value >= industry_value else 1 - (industry_value - student_value) / 4",
+          "rationale": "门槛型：产业值是要求，学生达到或超过要求即满分，能力溢出不应扣分。"
+        },
+        "provision_type": {
+          "applies_to": [
+            "career_value_tags.*"
+          ],
+          "iteration_scope": "与其他维度不同：遍历学生问卷中的全部career_value标签（并集），而非仅产业match_tags。产业未声明的价值标签按默认供给值2.5处理——产业没把某价值列为卖点，视为中等偏低供给。",
+          "formula": "match = 1 - max(0, student_value - industry_value) / 4，其中industry_value缺失时取2.5",
+          "weighting": "按学生需求强度加权：weight = student_value。career_value_match = Σ(match_i * sv_i) / Σ(sv_i) * 100。学生不在乎的价值（sv=1,2）几乎不影响得分，学生强烈要求的价值（sv=4,5）主导得分。",
+          "rationale": "v1.1初稿的纯单边供给规则有缺陷：标签值普遍高的产业（如银发经济）对所有学生都接近满分，且产业未声明的价值永远不被检验（要求高收入的学生不会因产业低薪被扣分）。需求加权+并集遍历解决这两点：价值匹配回答的是\"学生最在乎的东西，这个产业给不给得起\"。"
+        },
+        "symmetric_type": {
+          "applies_to": [
+            "interest_tags.*"
+          ],
+          "formula": "match = 1 - abs(student_value - industry_value) / 4",
+          "rationale": "兴趣保留对称距离：兴趣远高于产业相关度时，学生在该产业可能得不到满足，轻度扣分合理。"
+        }
+      },
+      "clamp": {
+        "min": 0,
+        "max": 1
+      },
+      "score_conversion": "match * 100",
+      "examples": [
+        {
+          "group": "threshold_type",
+          "student_value": 5,
+          "industry_value": 3,
+          "match": 1.0,
+          "note": "能力超出要求不扣分（v1.0会错误地只给0.5）"
+        },
+        {
+          "group": "threshold_type",
+          "student_value": 3,
+          "industry_value": 5,
+          "match": 0.5
+        },
+        {
+          "group": "provision_type",
+          "student_value": 3,
+          "industry_value": 5,
+          "match": 1.0,
+          "note": "产业提供的高于学生诉求，满分"
+        },
+        {
+          "group": "symmetric_type",
+          "student_value": 4,
+          "industry_value": 5,
+          "match": 0.75
+        }
+      ]
+    },
+    "unknown_student_tag_strategy": {
+      "student_value_0": {
+        "strategy": "neutral_low_confidence",
+        "default_match": 0.55,
+        "note": "0表示未知，不应直接按最低分处理，否则未采集标签会误伤推荐。"
+      }
+    },
+    "dimension_group_mapping": {
+      "career_value_match": "career_value_tags.*",
+      "interest_match": "interest_tags.*",
+      "ability_match": "ability_tags.*",
+      "risk_tolerance_match": "risk_tolerance_tags.*",
+      "education_plan_match": "education_plan_tags.*"
+    },
+    "learning_style_and_work_scene_handling": {
+      "strategy": "supporting_evidence",
+      "rule": "learning_style_tags和work_scene_tags不进入主公式维度，但若产业match_tags中存在这些标签且学生已作答（值>0），可作为辅助匹配项给各主维度叠加附加分，单维度附加分不超过该维度得分的10%。",
+      "unanswered_rule": "未作答（值=0）的辅助标签不参与附加分计算；若该产业的辅助标签学生全部未作答，则bonus=0。严禁用0.55中性默认值给未采集的辅助标签加分——否则会给每个维度凭空抬约5分、把没填学习方式/工作场景的学生整体虚高。",
+      "reason": "避免快速版问卷没有完整采集学习方式和工作场景时导致分数不稳定，同时不让缺测项反向变成加分项。"
+    },
+    "coverage_confidence_rule": {
+      "description": "若学生画像对某产业match_tags的已知覆盖率过低，匹配分主要由0.55中性默认值构成，区分度失效。",
+      "coverage_formula": "coverage = 已知标签数(student_value>0) / 该产业主公式维度match_tags总数",
+      "rules": [
+        "若 coverage < 0.5：该产业结果标记 low_confidence=true，输出时提示\"信息不足，建议补充测评\"，且不得占据Top3前排（quick与deep模式一致）。注意：低置信产业仍可能因高置信产业不足而被兜底进入主列表后段，但会排在所有高置信产业之后。",
+        "若 coverage < 0.3：该产业不进入打分，归入coverage_warnings，仅提示需要补充哪些维度的问题。",
+        "若主列表Top3全部为low_confidence，则整体置 insufficient_data=true，提示先补测评再看结论。"
+      ],
+      "mode_note": "low_confidence挤出Top3不分quick/deep一律生效。快问卷不会因此清空结果——靠graceful fill兜底，只是低置信项不占前排。",
+      "questionnaire_implication": "问卷必须覆盖各产业的高区分度标签，尤其是：interest_tags.life_health、ability_tags.chemistry_biology、education_plan_tags.accept_long_training（医疗方向）、interest_tags.business（商业方向）、interest_tags.people（公共服务/养老方向）。这些标签缺失时对应产业整体失真。"
+    }
+  },
+  "market_adaptive_penalties": {
+    "competition_penalty": {
+      "condition": "market_scores.competition_level >= 4 and student.risk_tolerance_tags.competition_tolerance <= 2",
+      "penalty": 8,
+      "reason": "学生竞争承受度低，但产业竞争强。"
+    },
+    "city_concentration_penalty": {
+      "condition": "market_scores.city_concentration >= 4 and (student.risk_tolerance_tags.big_city_tolerance <= 2 or student.constraint_tags.avoid_big_city_concentration == true)",
+      "penalty": 8,
+      "reason": "学生不适合大城市集中岗位。"
+    },
+    "master_requirement_penalty": {
+      "condition": "market_scores.master_requirement >= 4 and (student.education_plan_tags.accept_master <= 2 or student.constraint_tags.avoid_master_required == true)",
+      "penalty": 10,
+      "reason": "产业高质量岗位偏好研究生，但学生不愿读研。"
+    },
+    "income_volatility_penalty": {
+      "condition": "market_scores.stability_score <= 2 and (student.constraint_tags.avoid_income_volatility == true or student.constraint_tags.avoid_unstable_employment == true)",
+      "penalty": 8,
+      "reason": "学生规避收入波动/就业不稳定，但产业稳定性较弱。",
+      "note": "avoid_income_volatility与avoid_unstable_employment语义重复且产业库中混用，任一命中即触发；两者与本惩罚同归income_volatility根因去重。建议产业库下一版合并为单一标签。"
+    },
+    "ai_risk_penalty": {
+      "condition": "market_scores.ai_substitution_risk >= 4 and student.constraint_tags.avoid_ai_substitution_risk == true",
+      "penalty": 8,
+      "reason": "学生规避AI替代风险，但产业中部分岗位替代风险较高。"
+    }
+  },
+  "not_recommended_if_rules": {
+    "description": "产业库中的not_recommended_if字段用于排除、强惩罚或弱惩罚。",
+    "default_action": "soft_penalty",
+    "rule_types": {
+      "hard_exclusion": {
+        "penalty": 60,
+        "output_bucket": "not_recommended_industries",
+        "conditions": [
+          "exclusion_tags.no_medicine for medical/healthcare industry",
+          "exclusion_tags.no_programming for AI/software industry",
+          "exclusion_tags.no_public_exam for public-sector exam industry"
+        ],
+        "subject_constraint_note": "选科类条件（如constraint_tags.subject_chemistry==false）在产业阶段不做硬排除，只在risk_notes里追加预警，最终硬过滤交给专业库阶段。原因：画像只存正向布尔标签（没选化学=该key缺失，而非显式false），缺失值按规则不触发hard_exclusion，因此subject_xxx==false在产业层本就无法稳定命中，不应列为产业层硬排除。"
+      },
+      "strong_penalty": {
+        "penalty": 35,
+        "conditions": [
+          "exclusion_tags.no_long_training",
+          "exclusion_tags.no_high_overtime",
+          "exclusion_tags.no_factory_site",
+          "constraint_tags.avoid_master_required",
+          "constraint_tags.avoid_high_competition"
+        ]
+      },
+      "soft_penalty": {
+        "penalty": 18,
+        "conditions": [
+          "constraint_tags.avoid_unclear_path",
+          "constraint_tags.avoid_low_income_ceiling",
+          "constraint_tags.avoid_family_resource_dependence",
+          "constraint_tags.avoid_not_local_friendly"
+        ]
+      }
+    },
+    "custom_condition_parser": {
+      "supports": [
+        "exclusion_tags.xxx",
+        "constraint_tags.xxx",
+        "constraint_tags.subject_chemistry==false"
+      ],
+      "boolean_path_rule": "若路径值为true，则条件命中。路径缺失或为0（未知）视为未命中。",
+      "explicit_false_rule": "若条件形如 path==false：仅当路径值显式为false时命中；路径缺失（未采集）不命中。",
+      "missing_value_handling": "缺失值绝不触发hard_exclusion或strong_penalty。若缺失标签涉及hard_exclusion条件（如选科），在输出的risk_notes中追加\"该方向对XX有硬性要求，请确认你的选科/意愿\"预警，由专业库阶段做最终硬过滤。",
+      "rationale": "与numeric_tag_scale中\"0=未知不代表排斥\"保持一致；问卷未覆盖的字段不能替学生做排除决定。"
+    }
+  },
+  "output_level_rules": {
+    "A": {
+      "min_score": 85,
+      "max_score": 100,
+      "label": "强推荐",
+      "description": "画像匹配高、就业解释充分、风险可接受。"
+    },
+    "B": {
+      "min_score": 70,
+      "max_score": 84,
+      "label": "可考虑",
+      "description": "整体匹配较好，但存在能力、学历、城市、风险或就业门槛。"
+    },
+    "C": {
+      "min_score": 55,
+      "max_score": 69,
+      "label": "谨慎考虑",
+      "description": "有一定相关性，但不应作为主推，需要结合具体职业和专业进一步判断。"
+    },
+    "D": {
+      "min_score": 0,
+      "max_score": 54,
+      "label": "不推荐",
+      "description": "匹配度低或排除条件明显冲突。"
+    }
+  },
+  "ranking_rules": {
+    "default_top_n": 5,
+    "main_output_top_n": 3,
+    "main_output_top_n_note": "引擎返回default_top_n=5个推荐，其中前main_output_top_n=3个为主推、其余为备选，主推/备选的区分由展示层负责，不改变引擎打分与排序。",
+    "minimum_gap_for_same_level": 3,
+    "minimum_gap_note": "展示层建议：相邻两个产业最终分差<3时视为同档，UI不宜用分差暗示明显优劣（避免1分之差被读成档次差）。这是展示层提示，不参与引擎排序与分档（分档以output_level_rules阈值为准）。",
+    "tie_breakers": [
+      {
+        "field": "profile_match_score",
+        "order": "desc",
+        "description": "画像匹配更高者优先。"
+      },
+      {
+        "field": "market_scores.undergrad_employment_score",
+        "order": "desc",
+        "description": "本科就业友好度更高者优先。"
+      },
+      {
+        "field": "market_scores.job_volume_score",
+        "order": "desc",
+        "description": "岗位量更高者优先。"
+      },
+      {
+        "field": "market_scores.stability_score",
+        "order": "desc",
+        "description": "稳定性更高者优先（无条件兜底项；学生稳定性偏好已通过career_value_tags.stability进入主公式，此处不再重复判断）。"
+      }
+    ],
+    "future_frontier_limit": {
+      "rule": "future_frontier产业默认不进入Top3。",
+      "extension_slot_rule": "若学生 education_plan_tags.accept_master >= 4 且存在 profile_match_score >= 85 的future_frontier产业，则在主输出Top3之外附加1个得分最高的frontier方向，标记为\"高潜延伸推荐\"。该方向不参与Top3排序，输出时必须同时展示其本科就业风险提示。",
+      "reason": "前沿产业本科就业确定性弱（undergrad_employment_score通常1-2），按总分排序天然低于成熟产业——这是正确的，不应靠加分扭曲。延伸位让高潜学生能看到前沿方向，同时不向普通学生过度兜售风口。"
+    },
+    "employment_strategy_handling": {
+      "rule": "industry_type == employment_strategy 的方向可以进入Top3，但输出时要标记为就业策略方向，而非传统产业。",
+      "example": "考公考编、事业单位与国央企稳定就业",
+      "data_requirement": "产业库每个产业必须显式声明industry_type；缺省一律按industrial_sector处理。当前仅IND_PUBLIC_SECTOR_EXAM_STABLE_EMPLOYMENT为employment_strategy，其余均为industrial_sector。"
+    }
+  },
+  "reason_generation_rules": {
+    "matched_reason_count": {
+      "min": 3,
+      "max": 6,
+      "enforcement": "先收集match>=0.5的强匹配理由；若不足min=3条，放宽到match>=0.35兜底；最多输出max=6条。理由仅来自学生已作答(值>0)的标签，无法靠未作答标签凑数。若产业可解释标签确实太少，可能仍少于3条，此时应配合low_confidence提示。"
+    },
+    "risk_note_count": {
+      "min": 2,
+      "max": 5,
+      "enforcement": "硬性选科/意愿预警(missingHardWarnings)优先排前，其后接产业固有risk_notes，合并后裁剪到max=5条。产业库每个产业的risk_notes应至少写2条以满足下限。"
+    },
+    "matched_reason_templates": {
+      "career_value_tags.high_income": "高收入目标匹配",
+      "career_value_tags.stability": "稳定就业目标匹配",
+      "career_value_tags.technical_barrier": "技术壁垒目标匹配",
+      "career_value_tags.undergrad_employment": "本科就业目标匹配",
+      "career_value_tags.local_development": "本地发展目标匹配",
+      "career_value_tags.public_sector": "体制内/编制/国企倾向匹配",
+      "interest_tags.data": "数据分析兴趣较强",
+      "interest_tags.code_system": "代码/系统兴趣较强",
+      "interest_tags.machine": "机器设备和工程系统兴趣较强",
+      "interest_tags.life_health": "生命健康兴趣较强",
+      "interest_tags.people": "愿意与人沟通和服务",
+      "interest_tags.business": "商业和运营兴趣较强",
+      "interest_tags.text_expression": "文字表达和内容兴趣较强",
+      "interest_tags.law_rules": "规则、法律和制度兴趣较强",
+      "ability_tags.math": "数学能力匹配",
+      "ability_tags.logic": "逻辑能力匹配",
+      "ability_tags.programming_acceptance": "编程接受度较高",
+      "ability_tags.language_expression": "写作表达能力匹配",
+      "ability_tags.memory": "记忆背诵能力匹配",
+      "risk_tolerance_tags.competition_tolerance": "能接受一定竞争",
+      "risk_tolerance_tags.overtime_tolerance": "能接受一定工作强度",
+      "education_plan_tags.accept_master": "能够接受继续深造",
+      "education_plan_tags.prefer_undergrad_employment": "本科就业诉求匹配"
+    },
+    "conflict_reason_templates": {
+      "exclusion_tags.no_medicine": "学生明确排斥医学或医院环境",
+      "exclusion_tags.no_programming": "学生明确排斥编程",
+      "exclusion_tags.no_sales": "学生明确排斥销售或强客户沟通",
+      "exclusion_tags.no_public_exam": "学生明确不愿意考公考编",
+      "exclusion_tags.no_factory_site": "学生不希望去工厂或工程现场",
+      "exclusion_tags.no_long_training": "学生不接受长期培养或深造周期",
+      "constraint_tags.avoid_high_competition": "学生希望规避高竞争",
+      "constraint_tags.avoid_master_required": "学生希望规避读研依赖",
+      "constraint_tags.avoid_big_city_concentration": "学生希望规避大城市岗位集中",
+      "constraint_tags.avoid_ai_substitution_risk": "学生希望规避AI替代风险"
+    }
+  },
+  "output_schema": {
+    "student_id": "string",
+    "matcher_version": "string",
+    "recommended_industries": [
+      {
+        "rank": "number",
+        "industry_id": "string",
+        "industry_name": "string",
+        "industry_type": "industrial_sector | employment_strategy | unknown",
+        "tier": "employment_friendly | policy_growth | future_frontier",
+        "score": "number 0-100",
+        "level": "A | B | C | D",
+        "level_label": "string",
+        "profile_match_score": "number 0-100",
+        "market_fit_score": "number 0-100",
+        "penalty_score": "number",
+        "matched_reasons": "array<string>",
+        "risk_notes": "array<string>",
+        "related_career_paths": "array<string>",
+        "related_majors": "array<string>",
+        "recommendation_note": "string"
+      }
+    ],
+    "not_recommended_industries": [
+      {
+        "industry_id": "string",
+        "industry_name": "string",
+        "score_before_penalty": "number",
+        "final_score": "number",
+        "reason": "string",
+        "conflict_tags": "array<string>"
+      }
+    ],
+    "debug_info": {
+      "enabled": false,
+      "description": "开发阶段可打开，用于查看每个产业各维度得分。正式给用户展示时关闭。"
+    }
+  },
+  "test_expectations": [
+    {
+      "case_name": "高收入技术型",
+      "expected_top_industries": [
+        "IND_AI_SOFTWARE",
+        "IND_SMART_EV_CONNECTED_VEHICLE",
+        "IND_IC_ELECTRONICS"
+      ],
+      "should_not_top": [
+        "IND_BIOMED_HEALTHCARE",
+        "IND_SILVER_ECONOMY_ELDERCARE"
+      ]
+    },
+    {
+      "case_name": "稳定考公型",
+      "expected_top_industries": [
+        "IND_PUBLIC_SECTOR_EXAM_STABLE_EMPLOYMENT",
+        "IND_PUBLIC_EDUCATION_GOVERNANCE",
+        "IND_SILVER_ECONOMY_ELDERCARE"
+      ],
+      "should_not_top": [
+        "IND_AI_SOFTWARE",
+        "IND_DIGITAL_CONTENT_DESIGN"
+      ]
+    },
+    {
+      "case_name": "医疗长期主义型",
+      "expected_top_industries": [
+        "IND_BIOMED_HEALTHCARE",
+        "IND_SILVER_ECONOMY_ELDERCARE"
+      ],
+      "expected_in_top5": [
+        "IND_PET_ECONOMY_ANIMAL_HEALTH"
+      ],
+      "should_not_top": [
+        "IND_AI_SOFTWARE"
+      ],
+      "note": "v1.3.1收紧万金油后修订：人用医疗长期主义画像的Top3应为生物医药+银发康养等强相关方向；宠物经济(动物健康)与人用医疗仅生命健康/长培养弱重叠，下调至Top5延伸区间，不再占据Top3——这是收紧PET万金油标签(删business/people/high_income/social_value/art_design)的预期结果，而非回归。"
+    },
+    {
+      "case_name": "商业运营型",
+      "expected_top_industries": [
+        "IND_FINTECH_DATA_BUSINESS",
+        "IND_CROSS_BORDER_ECOMMERCE_CONSUMER_BRAND",
+        "IND_TRANSPORT_LOGISTICS_SUPPLY_CHAIN"
+      ],
+      "should_not_top": [
+        "IND_QUANTUM_6G_FUTURE_COMM"
+      ]
+    },
+    {
+      "case_name": "高潜科研型",
+      "expected_top_industries": [
+        "IND_IC_ELECTRONICS",
+        "IND_AI_SOFTWARE",
+        "IND_SMART_EV_CONNECTED_VEHICLE"
+      ],
+      "note": "修订：frontier产业本科就业分极低，总分排序低于成熟硬科技产业是正确行为。高潜学生通过延伸推荐位看到frontier方向，Top3仍以就业可解释的成熟产业为主。",
+      "expected_extension_slot": [
+        "IND_QUANTUM_6G_FUTURE_COMM",
+        "IND_EMBODIED_AI_BCI_ADVANCED_INTERACTION",
+        "IND_BIO_MANUFACTURING_SYNTHETIC_BIO"
+      ]
+    }
+  ],
+  "implementation_notes": [
+    "惩罚去重（penalty_deduplication）必须在求和前执行，实现时先收集全部命中惩罚再按root_cause分组取max。",
+    "第一版不要用AI直接给分，先用规则引擎给分。",
+    "AI可以用于把结果解释成自然语言，但不要让AI覆盖final_score。",
+    "产业推荐只输出方向，不等同于最终专业推荐。",
+    "产业Top3跑通后，再建设career_path_library.json。",
+    "专业选科硬约束应在专业库阶段做最终过滤；产业阶段只做提示或预警。",
+    "调参时优先检查Top3是否符合常识，再看分数细节。",
+    "校准提示：IND_SILVER_ECONOMY_ELDERCARE的match_tags多达20个且要求普遍温和，模拟中在3/5画像进入Top3，有\"万金油产业\"倾向。建议在产业库下一版收紧为核心区分标签（interest_tags.people、interest_tags.life_health、career_value_tags.social_value、career_value_tags.stability），删除business、education_growth等弱相关标签。"
+  ],
+  "penalty_deduplication": {
+    "description": "同一根本原因可能同时触发market_adaptive_penalties和not_recommended_if惩罚，去重后只取最大值，防止重复扣分把B档误打成D档。",
+    "rule": "将所有命中的惩罚按root_cause分组，每组只保留penalty最大的一条；不同root_cause的惩罚正常累加。",
+    "root_cause_groups": {
+      "master_requirement": [
+        "market_adaptive_penalties.master_requirement_penalty",
+        "not_recommended_if: constraint_tags.avoid_master_required"
+      ],
+      "competition": [
+        "market_adaptive_penalties.competition_penalty",
+        "not_recommended_if: constraint_tags.avoid_high_competition"
+      ],
+      "city_concentration": [
+        "market_adaptive_penalties.city_concentration_penalty",
+        "not_recommended_if: constraint_tags.avoid_big_city_concentration"
+      ],
+      "ai_substitution": [
+        "market_adaptive_penalties.ai_risk_penalty",
+        "not_recommended_if: constraint_tags.avoid_ai_substitution_risk"
+      ],
+      "income_volatility": [
+        "market_adaptive_penalties.income_volatility_penalty",
+        "not_recommended_if: constraint_tags.avoid_unstable_employment",
+        "not_recommended_if: constraint_tags.avoid_income_volatility"
+      ]
+    },
+    "example": "学生avoid_master_required=true且产业master_requirement=5：strong_penalty(35)与master_requirement_penalty(10)同组，只扣35分，不扣45分。"
+  },
+  "known_limitations": {
+    "description": "以下为已知设计权衡/局限，当前版本有意保留（修起来要动数据建模或问卷，不宜在打分层硬改），调参与下一版建库时需留意。",
+    "items": [
+      {
+        "id": "coverage_denominator_vs_career_value_scope",
+        "issue": "coverage按\"产业match_tags主维度标签总数\"为分母，但career_value_match实际遍历的是\"学生career_value标签的并集\"，两套口径不完全一致。",
+        "impact": "覆盖率数字与真正参与career_value打分的标签集对不上，可能让某些产业的low_confidence判定略偏严或偏松。",
+        "decision": "暂不改。career_value的并集遍历是v1.1刻意为修\"高供给通吃\"引入的，coverage改成同口径会牵动门槛校准，留待用真实问卷数据回归后统一调整。"
+      },
+      {
+        "id": "many_tag_industries_harder_to_pass_coverage",
+        "issue": "标签多的产业（SILVER 14、PET 16、PUBLIC_SECTOR 15）需要学生作答更多题才能过coverage门槛，标签少的产业更容易过线。",
+        "impact": "快问卷下大库\"万金油\"产业更易跌破0.3被整片删掉——与收紧万金油的意图方向一致，但属于副作用而非有意设计。",
+        "decision": "暂不在打分层改。正解是按implementation_notes把万金油产业的match_tags收紧到核心区分标签，从数据侧解决。"
+      },
+      {
+        "id": "career_value_default_2_5_is_a_guess",
+        "issue": "产业未声明的career_value标签按默认供给值2.5参与，学生若强烈要求该价值会被扣分。",
+        "impact": "真实满足但产业库漏标某价值卖点的产业会被低估，强依赖产业库标注完整度。",
+        "decision": "保留2.5默认（v1.1设计），但产业库应尽量把真实卖点标全，尤其high_income/stability/technical_barrier。"
+      },
+      {
+        "id": "interest_only_iterates_industry_tags",
+        "issue": "interest维度只遍历产业声明的兴趣标签，学生真正的热情若产业没列则既不加分也不扣分，无法表达\"志趣与该产业无关\"。",
+        "impact": "兴趣匹配只衡量\"产业列出的兴趣\"，捕捉不到学生主导兴趣完全落空的情况。",
+        "decision": "结构性限制，暂不改；需要时应在产业库为每个产业补齐\"反向/低相关\"兴趣标签，或在画像层引入主导兴趣对齐度。"
+      },
+      {
+        "id": "fixed_70_30_and_market_convergence",
+        "issue": "profile 70% / market 30% 固定权重，market经(x-1)/4*100映射后成熟产业普遍偏高且彼此接近。",
+        "impact": "那30%对多数学生近似常数，实际区分度主要来自profile 70%。",
+        "decision": "保留权重，先确保Top3符合常识；若要提升market区分度，应先拉开产业库market_scores的差异而非改权重。"
+      }
+    ]
+  }
+}

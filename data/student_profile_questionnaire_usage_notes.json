@@ -1,0 +1,35 @@
+{
+  "name": "questionnaire_json_usage_notes",
+  "description": "前后端使用说明",
+  "frontend_rendering": {
+    "single_choice": "单选按钮或卡片",
+    "multi_select": "多选卡片；根据 max_select 限制数量",
+    "ranking_multi_select": "先选择，再拖拽排序；priority 从 1 开始",
+    "scale_1_5": "1-5 星/滑块/按钮",
+    "free_text": "文本输入框"
+  },
+  "custom_input": {
+    "option_level": "选项中 allow_custom_text=true 时，前端展示文本框。",
+    "question_level": "题目 allow_custom_option=true 时，可以展示“其他，请填写”。",
+    "storage": "自定义内容统一写入 raw_answers[].custom_answer，后端不要直接当作硬标签，先做归类。"
+  },
+  "scoring": {
+    "scale_1_5": "直接写入 target_tag 对应数值。",
+    "single_choice": "把所选 option.tag_effects 累加到画像标签。",
+    "multi_select": "把每个所选 option.tag_effects 累加；可做上限截断到 5。",
+    "ranking_multi_select": "按 priority 给权重，建议第1=5，第2=4，第3=3。",
+    "normalization": "同一标签多题累加后建议归一化到 1-5。硬性排除标签只要命中一次就是 true。"
+  },
+  "recommended_profile_types": [
+    "高收入技术型",
+    "稳定体制型",
+    "医疗长期主义型",
+    "商业经营型",
+    "内容创意型",
+    "工程制造型",
+    "教育服务型",
+    "研究深造型",
+    "本地稳定就业型",
+    "复合探索型"
+  ]
+}

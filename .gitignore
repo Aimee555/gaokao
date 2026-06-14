@@ -14,3 +14,9 @@ analytics-events.jsonl
 *.jsonl
 .claude/
 *.tsbuildinfo
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
